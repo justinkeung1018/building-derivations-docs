@@ -1,0 +1,60 @@
+% Language and font encodings
+\usepackage[UKenglish]{babel}
+\usepackage[UKenglish]{datetime}
+\let\dateUKenglish\relax
+\newdateformat{dateUKenglish}{\THEDAY~\monthname[\THEMONTH] \THEYEAR}
+\dateUKenglish
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% Sets page size and margins
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue, pdfencoding=auto, psdextra]{hyperref}
+\usepackage{csquotes}
+
+% Fancy headers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\newcommand{\maintitle}{Building derivations}
+
+\let\Chaptermark\chaptermark
+\def\chaptermark#1{\def\Chaptername{#1}\Chaptermark{#1}}
+\let\Sectionmark\sectionmark
+\def\sectionmark#1{\def\Sectionname{#1}\Sectionmark{#1}}
+\let\Subsectionmark\subsectionmark
+\def\subsectionmark#1{\def\Subsectionname{#1}\Subsectionmark{#1}}
+\let\Subsubsectionmark\subsubsectionmark
+\def\subsubsectionmark#1{\def\Subsubsectionname{#1}\Subsubsectionmark{#1}}
+
+\lhead{\maintitle}
+\rhead{\textsc{\Chaptername}}
+\lfoot{Justin Keung}
+\renewcommand{\footrulewidth}{0.4pt} % Make footer line visible
+
+% Biblatex
+\usepackage[backend=biber,style=vancouver,uniquename=false]{biblatex}
+\addbibresource{bibliography.bib}
+
+\definecolor[named]{ImperialBlue}{HTML}{003e74}
+\definecolor[named]{ForestGreen}{HTML}{009B55}
+\definecolor[named]{Mint}{HTML}{96DEC4}
+\definecolor[named]{DarkRed}{HTML}{A50000}
+\definecolor[named]{ACMPurple}{cmyk}{0.55,1,0,0.15}
+\definecolor[named]{ACMDarkBlue}{cmyk}{1,0.58,0,0.21}
+\hypersetup{colorlinks,
+    linkcolor=ACMPurple,
+    citecolor=ACMPurple,
+    urlcolor=ACMDarkBlue,
+    filecolor=ACMDarkBlue}
+
+% EBNF syntax
+\newcommand{\nonterm}[1]{\langle\mathit{#1}\rangle}
+\newcommand{\term}[1]{\text{ `#1' }}
+\newcommand{\alt}{\ |\ }
