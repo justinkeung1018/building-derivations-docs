@@ -4,6 +4,12 @@
 \let\dateUKenglish\relax
 \newdateformat{dateUKenglish}{\THEDAY~\monthname[\THEMONTH] \THEYEAR}
 \dateUKenglish
+
+% Fonts
+\usepackage[tt=false, type1=true]{libertine}
+% \usepackage[varqu]{zi4} % In LuaTeX this turns quotes into \textquotesingle within listings, breaking the tt font
+% \usepackage[libertine]{newtxmath}
+% \usepackage[scaled=0.8, lining]{FiraMono}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 
@@ -15,8 +21,9 @@
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{graphicx}
-\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorinlistoftodos, disable]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue, pdfencoding=auto, psdextra]{hyperref}
+\usepackage{cleveref}
 \usepackage{csquotes}
 
 % Fancy headers
@@ -58,3 +65,48 @@
 \newcommand{\nonterm}[1]{\langle\mathit{#1}\rangle}
 \newcommand{\term}[1]{\text{ `#1' }}
 \newcommand{\alt}{\ |\ }
+
+% Code
+\usepackage{listings}
+% \usepackage{color}
+% \definecolor{lightgray}{rgb}{.9,.9,.9}
+% \definecolor{darkgray}{rgb}{.4,.4,.4}
+% \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+% \lstdefinelanguage{JavaScript}{
+%   keywords={break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with},
+%   morecomment=[l]{//},
+%   morecomment=[s]{/*}{*/},
+%   morestring=[b]',
+%   morestring=[b]",
+%   ndkeywords={class, export, boolean, throw, implements, import, this},
+%   keywordstyle=\color{blue}\bfseries,
+%   ndkeywordstyle=\color{darkgray}\bfseries,
+%   identifierstyle=\color{black},
+%   commentstyle=\color{purple}\ttfamily,
+%   stringstyle=\color{red}\ttfamily,
+%   sensitive=true
+% }
+
+\lstset{
+%   language=JavaScript,
+  basicstyle=\ttfamily,
+  mathescape,
+  breaklines,
+  alsoletter={_},
+  gobble=4,
+  columns=fullflexible,
+  % framesep=1pt,
+  numbers=left,
+  numberstyle=\ttfamily\footnotesize,
+  xleftmargin=20pt,
+  xrightmargin=5pt,
+  % showspaces,
+  keepspaces,
+  escapechar=@,
+  % belowskip=-0.8 \baselineskip,
+}
+
+% Tables
+\usepackage{tabularray}
+\usepackage{booktabs}
+\UseTblrLibrary{booktabs}
