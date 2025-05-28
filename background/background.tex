@@ -27,14 +27,5 @@ Carnap \cite{carnap, carnap:2018} is an educational tool for a variety of formal
 \subsubsection{Clear layout of all syntactic rules}
  Although there are no syntax guides immediately surrounding the widgets in the textbook, the relevant syntax is introduced when a new widget first appears. This is natural when going through the textbook sequentially, but can be cumbersome for someone hoping to review exercises in later parts of the textbook but have forgotten the syntax. The input syntaxes for all formal systems supported by Carnap are enumerated on one webpage \cite{carnap:systems}, though it is somewhat unintuitive to access from the home page. It is possible that users may experience less friction if they can be quickly reminded of the input syntax in all situations.
 
-\section{Parsing inputs}
-For the minimal working example at the time of writing, the parser for conclusions in the Lambda Calculus (with syntax defined in \Cref{lambda:type-assignment}) is written using the TypeScript-based parser combinator library \texttt{ts-parsec} \cite{tsparsec}. It does not appear to give very informative error messages. If parsing errors prove useful for giving hints on how to fix a malformed derivation tree or other purposes, we may explore other parser combinator libraries written in JavaScript or TypeScript, such as \texttt{parjs} \cite{parjs}, or less ideally, libraries written in other languages.
-
-Parser combinator libraries written in JavaScript or TypeScript are preferred as they can be bundled with the rest of the client-side code and served to the client. This means the web application would be run entirely on the client's machine, including parsing inputs. If libraries in other languages were used instead, we would need to make API requests over the internet during parsing. This not only limits how often we can parse inputs to make the application more responsive, but also may not work well on machines with poor internet connections.
-
-Once the parser combinator library is finalised, we will include a description of what parser combinators are (illustrated with code snippets using the chosen library), weigh the pros and cons of the various libraries available, and explain the significance of error messages.
-
-% Build parser using ts-parsec (use ts so everything runs on client-side)
-% Allow a range of input formats (current: Haskell-like, future: latex, ascii?)
-% Convert all input formats into latex
+\input{background/parsing.tex}
 

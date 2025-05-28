@@ -1,8 +1,8 @@
 \section{Lambda Calculus}
 In the 1930s, Alonzo Church introduced the Lambda Calculus \cite{church:1936} as a model of computation that is Turing-complete \cite{turing:1937}. It is the basis of functional programming languages like Haskell, which all Computing students at Imperial are required to learn. In addition, the Lambda Calculus is taught as part of the mandatory second-year \textit{Models of Computation} module and the TSfPL elective. In this section, we will define $\lambda$-terms and the Curry type assignment system, then formulate alternative syntaxes in extended Backus-Naur form (EBNF) for constructing the relevant parsers.
 
-\subsection{\(\lambda\)-terms}\label{lambda:lambda-terms}
-\textit{$\lambda$-terms} are defined as follows \cite{church:1941}:
+\subsection{\texorpdfstring{$\lambda$}{Lambda}-terms}\label{lambda:lambda-terms}
+$\lambda$-terms are defined as follows \cite{church:1941}:
 \[
     M,N \Coloneqq x \alt \underbracket[0.6pt]{(\lambda x. M)}_\text{abstraction} \alt \underbracket[0.6pt]{(MN)}_\text{application}
 \]
