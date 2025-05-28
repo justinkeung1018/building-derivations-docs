@@ -1,9 +1,10 @@
 \section{Lambda Calculus}
+In the 1930s, Alonzo Church introduced the Lambda Calculus \cite{church:1936} as a model of computation that is Turing-complete \cite{turing:1937}. It is the basis of functional programming languages like Haskell, which all Computing students at Imperial are required to learn. In addition, the Lambda Calculus is taught as part of the mandatory second-year \textit{Models of Computation} module and the TSfPL elective. In this section, we will define $\lambda$-terms and the Curry type assignment system, then formulate alternative syntaxes in extended Backus-Naur form (EBNF) for constructing the relevant parsers.
 
 \subsection{\texorpdfstring{$\lambda$}{Lambda}-terms}\label{lambda:lambda-terms}
 $\lambda$-terms are defined as follows \cite{church:1941}:
 \[
-    M,N \Coloneqq x \alt (\lambda x. M) \alt (MN)
+    M,N \Coloneqq x \alt \underbracket[0.6pt]{(\lambda x. M)}_\text{abstraction} \alt \underbracket[0.6pt]{(MN)}_\text{application}
 \]
 where $x$ can be any symbol from an infinite list of term variables $a, b, c, \ldots, x, y, z \ldots$. Observe that abstractions and applications contain brackets to avoid ambiguity. We can alternatively express the syntax of $\lambda$-terms in Backus-Naur form (BNF):
 \begin{align*}
@@ -28,7 +29,7 @@ We allow partial adherence to these conventions as students inexperienced with t
     \nonterm{unbracketed} &\Coloneqq \nonterm{abstraction} \alt \nonterm{application} \\
     \nonterm{bracketed} &\Coloneqq \term{(} \nonterm{unbracketed} \term{)}
 \end{align*}
-Notice that the rule for $\nonterm{application}$ is left-recursive. This may cause infinite recursion in some parsers \todo{citation}, which is certainly undesirable in a web application. We mitigate this by rewriting $\nonterm{application}$ in extended Backus-Naur form (EBNF). The complete syntax of $\lambda$-terms with optional bracketing conventions in EBNF is presented here---the only change is made to the rule for $\nonterm{application}$.
+Notice that the rule for $\nonterm{application}$ is left-recursive. This may cause infinite recursion in recursive descent parsers, which is certainly undesirable in a web application. We mitigate this by rewriting $\nonterm{application}$ in EBNF. The complete syntax of $\lambda$-terms with optional bracketing conventions in EBNF is presented here---the only change is made to the rule for $\nonterm{application}$.
 \begin{align*}
     \nonterm{term} &\Coloneqq \nonterm{var} \alt \nonterm{unbracketed} \alt \nonterm{bracketed} \\
     \nonterm{var}  &\Coloneqq \textit{any lowercase letter} \\
@@ -41,7 +42,7 @@ Notice that the rule for $\nonterm{application}$ is left-recursive. This may cau
 Left-associativity of $\nonterm{application}$ will be enforced in the generation of the abstract syntax tree (AST).
 
 \subsection{Curry types}\label{lambda:curry-types}
-The set of Curry types is defined as follows \cite{van-bakel:2022}:
+The set of Curry \textit{types} is defined as follows \cite{van-bakel:2022}:
 \[
     A, B \Coloneqq \varphi \alt (A \rightarrow B)
 \]
@@ -69,14 +70,14 @@ We can rewrite the rule for $\nonterm{arrow}$ in EBNF as follows:
 \end{align*}
 As with $\lambda$-terms, the EBNF rule for $\nonterm{arrow}$ does not capture right-associativity, which can be handled when generating the AST.
 
-\subsection{Type inference rules}
-$\lambda$-terms can be assigned types under Curry's type assignment system using the following derivation rules \cite{van-bakel:2022} \todo{citation}:
+\subsection{Type inference rules}\label{lambda:type-assignment}
+$\lambda$-terms can be assigned types under Curry's type assignment system using the following derivation rules \cite{van-bakel:2022}:
 \[
     (Ax): \frac{}{\Gamma, x:A \vdash x:A} \quad (\rightarrow I): \frac{\Gamma, x:A \vdash M:B}{\Gamma \vdash \lambda x. M: A \rightarrow B} \quad (\rightarrow E): \frac{\Gamma \vdash M: A \rightarrow B \quad \Gamma \vdash N: A}{\Gamma \vdash MN: A \rightarrow B}
 \]
-A context $\Gamma$ is a set of statements in the form $x:A$, where $x$ is a variable and $A$ is a Curry type. All variables are assigned at most one type in any context, so $x:1, x:2$ is not a well-formed context since $x$ appears twice.
+A \textit{context} $\Gamma$ is a set of statements in the form $x:A$, where $x$ is a variable and $A$ is a Curry type. All variables are assigned at most one type in any context, so $x:1, x:2$ is not a well-formed context since $x$ appears twice.
 
-The syntax of a conclusion in the form of $\Gamma \vdash M: A$ can be expressed in EBNF as follows:
+The syntax of a \textit{conclusion}\todo{Check with Steffen on terminology} in the form of $\Gamma \vdash M: A$ can be expressed in EBNF as follows:
 \begin{align*}
     \nonterm{conclusion} &\Coloneqq \nonterm{context} \vdash \nonterm{term} : \nonterm{type} \\
     \nonterm{context} &\Coloneqq \varnothing \alt \nonterm{varassignment} \{, \nonterm{varassignment} \} \\

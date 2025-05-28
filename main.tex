@@ -7,14 +7,14 @@
 \begin{document}
 \input{title/title.tex}
 
-\begin{abstract}
-Your abstract goes here
-\end{abstract}
+% \begin{abstract}
+% Your abstract goes here
+% \end{abstract}
 
-\renewcommand{\abstractname}{Acknowledgements}
-\begin{abstract}
-Thanks mum!
-\end{abstract}
+% \renewcommand{\abstractname}{Acknowledgements}
+% \begin{abstract}
+% Thanks mum!
+% \end{abstract}
 
 \pagestyle{toc}
 \tableofcontents
@@ -32,6 +32,8 @@ Thanks mum!
 % \input{conclusion/conclusion.tex}
 % \input{appendix/appendix.tex}
 
+% Handle Dutch surnames with "van", see https://tex.stackexchange.com/questions/40747/bibtex-handling-of-the-dutch-van-name-prefix-with-natbib/40750#40750
+\DeclareRobustCommand{\VAN}[3]{#3}
 \printbibliography
 % \input{appendix/declaration.tex}
 
