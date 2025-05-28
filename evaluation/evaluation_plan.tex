@@ -1,3 +1,24 @@
 \chapter{Evaluation plan}
-% Collect qualitatitve feedback from peers who have taken TSfPL
-% If we do natural deduction too: ask PMT group, possibly send to first-years
+\section{User experience}
+\subsection{Collecting qualitative feedback}
+The tool is primarily intended to facilitate learning within the relevant modules at Imperial, with students beyond Imperial being the secondary focus. Therefore, it would be most beneficial to obtain qualitative feedback from current or recent students of TSfPL while the content is still fresh in their minds. Feedback from the broader type systems learning community may also be collected, if upon further research it is found that our tool is broadly adaptable to type systems courses at other institutions. However, any such adaptation must not sacrifice the similarities between our tool and the techniques introduced at Imperial, and therefore the intuitiveness of our tool to Imperial students.
+
+We intend to obtain user feedback multiple times over the course of developing the tool, i.e. until April or May. This can be done through in-person user feedback sessions, where recent TSfPL students gather to explore the user interactions of the current iteration of the tool and provide verbal qualitative feedback.
+
+If logic-related features (e.g. natural deduction) are built, user feedback can be collected from first-year Computing and JMC students in a similar manner.
+
+\subsection{Measuring the user experience of our tool}
+The user experience of the tool will be evaluated based on:
+\begin{itemize}
+    \item How well the final version of the tool addresses the pain points and needs of the users revealed during these feedback sessions
+    \item How enjoyable the user interactions are, compared to the existing learning tools presented in \Cref{background:enjoyable}
+\end{itemize}
+
+\section{Performance}
+Performance of the tool matters only if it negatively affects the user experience in certain scenarios, such as (realistically) large derivation trees. The primary performance concern is minimising the amount of computation done whenever the component tree re-renders, such as when the user changes the value of a node. This is important as all of the computation is done by the client. Some possible bottlenecks are:
+\begin{itemize}
+    \item Parsing the inputs at each node, such as when the AST is large or when the parser needs to backtrack often
+    \item Verifying the correct derivation rules have been applied
+    \item How much redundant work is done, such as re-verifying unchanged nodes
+\end{itemize}
+The performance of the tool can be quantified by performing benchmarks on various client systems. When performance issues are identified, the causes can be isolated and diagnosed by running performance tests on the constituent components, such as the parser and the verifier.

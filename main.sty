@@ -15,14 +15,23 @@
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{graphicx}
-\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorinlistoftodos, disable]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue, pdfencoding=auto, psdextra]{hyperref}
+\usepackage{cleveref}
 \usepackage{csquotes}
 
 % Fancy headers
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \newcommand{\maintitle}{Building derivations}
+
+% Tables
+\usepackage{tabularray}
+\usepackage{tabularx}
+\UseTblrLibrary{booktabs}
+
+% Greek letters (lambda) in bibliography
+\usepackage{textgreek}
 
 \let\Chaptermark\chaptermark
 \def\chaptermark#1{\def\Chaptername{#1}\Chaptermark{#1}}
@@ -39,9 +48,10 @@
 \renewcommand{\footrulewidth}{0.4pt} % Make footer line visible
 
 % Biblatex
-\usepackage[backend=biber,style=vancouver,uniquename=false]{biblatex}
+\usepackage[backend=biber,style=numeric,urldate=long,uniquename=false]{biblatex}
 \addbibresource{bibliography.bib}
 
+% Colours
 \definecolor[named]{ImperialBlue}{HTML}{003e74}
 \definecolor[named]{ForestGreen}{HTML}{009B55}
 \definecolor[named]{Mint}{HTML}{96DEC4}
@@ -58,3 +68,6 @@
 \newcommand{\nonterm}[1]{\langle\mathit{#1}\rangle}
 \newcommand{\term}[1]{\text{ `#1' }}
 \newcommand{\alt}{\ |\ }
+
+% Handle Dutch surnames with "van", see https://tex.stackexchange.com/questions/40747/bibtex-handling-of-the-dutch-van-name-prefix-with-natbib/40750#40750
+\DeclareRobustCommand{\VAN}[3]{#2}

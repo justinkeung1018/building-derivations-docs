@@ -1,39 +1,39 @@
-\chapter{Background}
+\chapter{Background}\label{background}
 This chapter provides an overview of the background knowledge necessary to understand the project.
 
 \input{background/lambda.tex}
 \input{background/milner.tex}
+\input{background/sequent.tex}
 
-\section{What makes a learning tool enjoyable to use?}
-There are relatively few interactive learning tools for type systems compared to logic and natural deduction. This may be because most computer science students around the world are required to take courses on logic but not type systems \todo{citation needed}. At Imperial, all first-year undergraduate students in Computing and Joint Mathematics and Computing are required to study propositional logic and first-order logic, while Type Systems for Programming Languages (TSfPL) is an elective module offered from the third year onwards. In this section, we will discuss several learning tools for natural deduction in propositional and first-order logic, focusing on the features that make them enjoyable or not enjoyable to use.
+\section{What makes a learning tool enjoyable to use?}\label{background:enjoyable}
+In this section, we will discuss several learning tools for natural deduction in propositional and first-order logic, focusing on the features that make them enjoyable or not enjoyable to use.
 
 \subsection{Pandora}
 Pandora \cite{pandora:2007} is a tool that helps students learn Fitch-style natural deduction. The current version \cite{pandora} is written in Java by former Imperial students for their undergraduate capstone projects. At Imperial, it is presented during lectures in the first-year logic module.
 
-\paragraph{Unnatural user interactions}
+\subsubsection{Unnatural user interactions}
 Using detailed logs to keep track of clicks and other interactions with Pandora, \cite{pandora:2007} found that students made infrequent use of the help and tutorial functionalities, even though they often failed to apply the rules correctly. For example, many students did not select the necessary lines before applying a rule. We hypothesise that students make these frequent mistakes when using Pandora because the sequence of interactions for applying rules does not correspond to how they apply natural deduction rules when writing proofs by hand. Suppose a student wants to apply the $\rightarrow I$ rule to lines 1 and 2. The justification would look like $\rightarrow I(1, 2)$. It is natural to write it from left to right, starting from $\rightarrow I$, then perhaps one or both of the brackets, then writing the line number 1, and finally the line number 2. The natural translation of this sequence into Pandora interactions would be to first click on the $\rightarrow I$ rule, then click on line 1, and finally click on line 2. Clearly, there is a discrepancy between this sequence and the current design.
 
 Therefore, we should design our tool such that the interactions required to build derivations mimic as closely as possible how students would be producing assessed or marked work. The more similar they are, the less assistance and explanation is needed for students to use the tool correctly.
 
-\paragraph{Installation necessary}
-Pandora is \textit{not} a web-based application. It can be run either as a JAR executable or using Java Web Start, a deprecated framework for starting Java applications using a web browser. The former starts up but fails to start a proof correctly and is essentially useless. The latter is not supported from Java 11 onwards and the installation of supported Java versions can be extremely tedious, especially on machines not using Intel-based architectures, which are prevalent today \todo{citation needed}.
+\subsubsection{Installation required}
+Pandora is \textit{not} a web-based application. It can be run either as a JAR executable or using Java Web Start, a deprecated framework for starting Java applications using a web browser. The former starts up but fails to start a proof correctly and is essentially useless. The latter is not supported from Java 11 onwards \cite{oracle:2020}, and even with Java 8 installed, the application throws an error on startup saying it is ``unsigned'' on the author's machine. Whatever means needed to open a functional Pandora version, if possible at all, is simply too complicated.
 
-The current version of Pandora is written over two decades ago \todo{fact check}. No matter how carefully we choose our tech stack, we cannot guarantee how long native applications will work until it fails to be compatible with future hardware, or be as tedious to install for students two decades later as Pandora is today. A simple workaround is to build a web application. It does not require installation other than a suitable web browser and the current versions of the canonical web technologies---HTML, CSS, and JavaScript---should not cease to be forwards-compatible any time soon. \todo{citation needed}
+The last update of Pandora was more than 15 years ago, according to the timestamp ``200810031955'' on the website \cite{pandora}. No matter how carefully we choose our tech stack, we cannot guarantee how long native applications will work until it fails to be compatible with future hardware, or be as tedious to install for students two decades later as Pandora is today. A simple workaround is to build a web application. It does not require installation other than a suitable web browser and the current versions of the canonical web technologies---HTML, CSS, and JavaScript---should not cease to be forwards-compatible any time soon.
 
 \subsection{Carnap}
-Carnap \cite{carnap:2018} is an educational tool for a variety of formal reasoning systems. It is written in Haskell and can be transpiled to JavaScript to be run on web browsers.
+Carnap \cite{carnap, carnap:2018} is an educational tool for a variety of formal reasoning systems and used by over 35 universities globally \cite{carnap:about}. It is written in Haskell and can be transpiled to JavaScript to be run on web browsers. The Carnap Book \cite{carnap:book} is a free web-based textbook with interactive widgets for practice problems on topics such as truth tables, formation trees, and natural deduction.
 
-\section{How do interactive tools help students learn?}
-\paragraph{Instant feedback}
-Interactive tools provide instant feedback to students on the correctness of their proofs and derivations. Although lecturers can provide model answers to sample problems, there are often multiple correct solutions that would be tedious to exhaustively enumerate. Interactive tools ease the burden of teaching staff on verifying students' solutions. This is not to say they are unimportant in facilitating students' learning---they can help explain \textit{why} a proof or derivation is incorrect using various approaches \cite{nipkow:2012}; while interactive tools can also provide explanations to a certain degree, they are not necessarily tailored to the student's understanding.
-
-\paragraph{More practice problems}
-In the Department of Computing at Imperial, students are not provided with mark schemes or model answers to past papers. Although students have access to past paper solutions crowdsourced from seniors and former students, the solutions may not be complete or correct, especially for older papers. Students can use interactive tools to check their solutions, even in the lack of model answers. This extends beyond past papers at Imperial. Arbitrary new problems in natural deduction can be generated \cite{ahmed:2013} for as much practice as students want.
-
-\paragraph{Enforcing methodical approaches}
-Although students at Imperial who used Pandora scored similarly in the natural deduction parts of the final exam as those who did not use Pandora, the former approached the problems more methodically, were less likely to make arbitrary assumptions, and were more precise in their proofs \cite{pandora:2007}. This may be because Pandora makes it somewhat tedious to undo large parts of the proof by design. Even after adding the functionality to undo multiple proof steps as proposed in \cite{pandora:2007}, it is still more difficult than crossing out an erroneous solution on paper with a pen. This friction may prompt students to think more carefully before proceeding with the next proof step in Pandora, and with enough practice, on paper as well.
+\subsubsection{Clear layout of all syntactic rules}
+ Although there are no syntax guides immediately surrounding the widgets in the textbook, the relevant syntax is introduced when a new widget first appears. This is natural when going through the textbook sequentially, but can be cumbersome for someone hoping to review exercises in later parts of the textbook but have forgotten the syntax. The input syntaxes for all formal systems supported by Carnap are enumerated on one webpage \cite{carnap:systems}, though it is somewhat unintuitive to access from the home page. It is possible that users may experience less friction if they can be quickly reminded of the input syntax in all situations.
 
 \section{Parsing inputs}
+For the minimal working example at the time of writing, the parser for conclusions in the Lambda Calculus (with syntax defined in \Cref{lambda:type-assignment}) is written using the TypeScript-based parser combinator library \texttt{ts-parsec} \cite{tsparsec}. It does not appear to give very informative error messages. If parsing errors prove useful for giving hints on how to fix a malformed derivation tree or other purposes, we may explore other parser combinator libraries written in JavaScript or TypeScript, such as \texttt{parjs} \cite{parjs}, or less ideally, libraries written in other languages.
+
+Parser combinator libraries written in JavaScript or TypeScript are preferred as they can be bundled with the rest of the client-side code and served to the client. This means the web application would be run entirely on the client's machine, including parsing inputs. If libraries in other languages were used instead, we would need to make API requests over the internet during parsing. This not only limits how often we can parse inputs to make the application more responsive, but also may not work well on machines with poor internet connections.
+
+Once the parser combinator library is finalised, we will include a description of what parser combinators are (illustrated with code snippets using the chosen library), weigh the pros and cons of the various libraries available, and explain the significance of error messages.
+
 % Build parser using ts-parsec (use ts so everything runs on client-side)
 % Allow a range of input formats (current: Haskell-like, future: latex, ascii?)
 % Convert all input formats into latex
