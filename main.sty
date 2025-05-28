@@ -16,6 +16,9 @@
 % Sets page size and margins
 \usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm,marginparwidth=1.75cm]{geometry}
 
+% New line between paragraphs
+\usepackage{parskip}
+
 % Useful packages
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -28,7 +31,6 @@
 
 % Fancy headers
 \usepackage{fancyhdr}
-\pagestyle{fancy}
 \newcommand{\maintitle}{Building derivations}
 
 \let\Chaptermark\chaptermark
@@ -40,10 +42,22 @@
 \let\Subsubsectionmark\subsubsectionmark
 \def\subsubsectionmark#1{\def\Subsubsectionname{#1}\Subsubsectionmark{#1}}
 
-\lhead{\maintitle}
-\rhead{\textsc{\Chaptername}}
-\lfoot{Justin Keung}
-\renewcommand{\footrulewidth}{0.4pt} % Make footer line visible
+% The table of contents needs a separate page style because the command \Chaptername is undefined in the table of contents, so we cannot use the fancy page style with a table of contents at least two pages long
+\fancypagestyle{toc}{
+    \lhead{\maintitle}
+    \rhead{Table of contents}
+    \lfoot{Justin Keung}
+    \renewcommand{\footrulewidth}{0.4pt} % Make footer line visible
+    \setlength{\headheight}{13.59999pt}
+}
+
+\fancypagestyle{fancy}{
+    \lhead{\maintitle}
+    \rhead{\textsc{\Chaptername}}
+    \lfoot{Justin Keung}
+    \renewcommand{\footrulewidth}{0.4pt} % Make footer line visible
+    \setlength{\headheight}{13.59999pt}
+}
 
 % Biblatex
 \usepackage[backend=biber,style=vancouver,uniquename=false]{biblatex}

@@ -1,4 +1,4 @@
-\documentclass[a4paper, twoside]{report}
+\documentclass[a4paper, twoside, 11pt]{report}
 \usepackage{main}
 
 \title{Building Derivations}
@@ -16,10 +16,12 @@ Your abstract goes here
 Thanks mum!
 \end{abstract}
 
+\pagestyle{toc}
 \tableofcontents
 \listoffigures
 \listoftables
 
+\pagestyle{fancy}
 \input{introduction/introduction.tex}
 \input{background/background.tex}
 \input{project/syntax.tex}
