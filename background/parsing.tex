@@ -60,55 +60,23 @@ One might mimic the structure of the definitions and create parsers as follows:
 \end{lstlisting}
 However, the parser \lstinline{s} only successfully parses the string ``xa'' but not ``xb''. In the latter case, the parser \lstinline{s} first tries to apply the parser \lstinline{first}. The parser \lstinline{first} tries to apply the parser \lstinline{x}, which succeeds. The parser \lstinline{first} then tries to apply the parser \lstinline{string("a")}, which fails softly. The \lstinline{then} combinator ``upgrades'' the soft failure to a hard failure, causing the \lstinline{first} parser to return a hard failure as well. The hard failure is propagated to \lstinline{or(second)}, which simply passes the hard failure along and causes the parser \lstinline{s} to return a hard failure as well.
 
-One solution is to manually recover from the hard failures returned by the \lstinline{then} combinators using the \lstinline{recover} combinator:
+According to the \lstinline{parjs} documentation, the idiomatic solution is to not create parsers by mimicking the structure of the definitions. When parsing definitions with multiple alternatives, the parser should first match the longest common prefix across all of the alternatives, then only apply the \lstinline{or} combinator when the subsequent parts of the alternatives are distinct \cite{parjs}. In this example, the parsers should be created like so:
+\begin{lstlisting}
+    const x = string("x");
+    const s = x.pipe(or(string("a")), or(string("b")));
+\end{lstlisting}
+This corresponds to the \textit{left-factored} definitions
+\begin{align*}
+    S &\Coloneqq X(a|b) \\
+    X &\Coloneqq x
+\end{align*}
+Left-factoring is the process of extracting common prefixes and rewriting alternatives such that no two alternatives share a leading unit of parsing. In this case, no two alternatives of the definition $X(a|b)$ begin with the same character, since $a$ is not equal to $b$. However, as later explained in \Cref{syntax:factorisation}, it is difficult to write a left-factoring algorithm that handles all possible cases with respect to the parsing tasks in this project.
+
+A less idiomatic solution (indeed, advised against by the \lstinline{parjs} documentation \cite{parjs}) is to manually recover from the hard failures returned by the \lstinline{then} combinators using the \lstinline{recover} combinator:
 \begin{lstlisting}
     ...
     const first = x.pipe(then(string("a")), recover(() => ({ kind: "Soft" })));
     const second = x.pipe(then(string("b")), recover(() => ({ kind: "Soft" })));
     ...
 \end{lstlisting}
-Here, the \lstinline{recover} combinator ``downgrades'' any failure, including hard and fatal failures, returned from the previous step to a soft failure. However, not only is this quite cumbersome, it also masks hard failures returned by the arguments to the \lstinline{then} combinators that should actually be reported to the user and cause parsing to halt. (The \lstinline{string} parsers in this case do not return hard failures, but more complex parsers in general may return hard failures.)
-
-The idiomatic solution, then, is to not create parsers by mimicking the structure of the definitions. When parsing definitions with multiple alternatives, the parser should first match the longest common prefix across all of the alternatives, then only apply the \lstinline{or} combinator when the subsequent parts of the alternatives are distinct \cite{parjs}. In this example, the parsers should be created like so:
-\begin{lstlisting}
-    const x = string("x");
-    const s = x.pipe(or(string("a")), or(string("b")));
-\end{lstlisting}
-This corresponds to the factorised definitions
-\begin{align*}
-    S &\Coloneqq X(a|b) \\
-    X &\Coloneqq x
-\end{align*}
-Syntax rules defined by the user may not always be factorised. Instead of throwing an error and telling the user to do the factorisation themselves, a factorisation algorithm processes the user-defined rules and outputs a factorised version of the rules. The factorisation algorithm is described in detail in \Cref{syntax:factorisation}.
-
-Yet line 6 fails. The \lstinline{term} parser first tries to apply the \lstinline{variable} parser, which fails softly, then it backtracks and tries the next alternative, which is the \lstinline{abstraction} parser. The input begins with a left parenthesis \lstinline{(}, so the \lstinline{string("(")} parser succeeds. The subsequent input does not match \lstinline{\lambda}, so the \lstinline{string("\\lambda")} parser emits a soft failure. The \lstinline{then} combinator turns the soft failure into a hard failure, causing the \lstinline{abstraction} parser to stop parsing and emit the hard failure. The \lstinline{term} parser cannot recover from the hard failure and also stops parsing. If the \lstinline{application} parser had emitted a soft failure instead, the \lstinline{term} parser would have been able to backtrack and try the last alternative, the \lstinline{application} parser, which would have successfully parsed the input.
-
-
-% The behaviour of the \lstinline{then} combinator ``upgrading'' soft failures to hard failures makes it tricky to use the \lstinline{or} combinator with more complex parsers. Consider the usual formulation of the definition of $\lambda$-terms \cite{church:1941}:
-% \[
-%     M,N \Coloneqq x \alt (\lambda x. M) \alt (MN)
-% \]
-% is not LL(0) since the second and third alternatives both begin with a left parenthesis \lstinline{(}. If one were to generate a parser for $\lambda$-terms without factorising the alternatives, one might write:
-% \begin{lstlisting}
-%     const variable = string("x");
-%     const abstraction = string("(").pipe(then(string("\\lambda")...));
-%     const application = string("(").pipe(then(...));
-%     const term = variable.pipe(or(abstraction), or(application));
-
-%     term.parse("((\\lambda x. x)(\\lambda x. x))");
-% \end{lstlisting}
-% Yet line 6 fails. The \lstinline{term} parser first tries to apply the \lstinline{variable} parser, which fails softly, then it backtracks and tries the next alternative, which is the \lstinline{abstraction} parser. The input begins with a left parenthesis \lstinline{(}, so the \lstinline{string("(")} parser succeeds. The subsequent input does not match \lstinline{\lambda}, so the \lstinline{string("\\lambda")} parser emits a soft failure. The \lstinline{then} combinator turns the soft failure into a hard failure, causing the \lstinline{abstraction} parser to stop parsing and emit the hard failure. The \lstinline{term} parser cannot recover from the hard failure and also stops parsing. If the \lstinline{application} parser had emitted a soft failure instead, the \lstinline{term} parser would have been able to backtrack and try the last alternative, the \lstinline{application} parser, which would have successfully parsed the input.
-
-% Suppose we create a parser using the \lstinline{then} combinator like
-% \begin{center}
-%     \lstinline{parser = parser1.pipe(then(parser2))}
-% \end{center}
-% This returns a parser that tries to parse using \lstinline{parser1}, and if \lstinline{parser1} succeeds, then tries to parse the rest of the input using \lstinline{parser2}. However, if \lstinline{parser2} fails (softly), the \lstinline{then} combinator produces a hard failure, which propagates to the top level and halts parsing immediately by default, instead of a soft failure, which can be caught by higher level combinators without failing catastrophically. In order to backtrack to \lstinline{parser1} if \lstinline{parser2} fails (softly), we must manually recover from the \lstinline{then} combinator like so:
-% \begin{center}
-%     \lstinline|parser = parser1.pipe(then(parser2), recover(() => ({ kind: "Soft" })))|
-% \end{center}
-% which is inconvenient and advised against in the README of the \lstinline{parjs} repo \cite{parjs}. In the context of parsing syntax rules, the user may supply rules in which multiple alternatives begin with the same token (i.e. not LL(0)). 
-
-% Build parser using ts-parsec (use ts so everything runs on client-side)
-% Allow a range of input formats (current: Haskell-like, future: latex, ascii?)
-% Convert all input formats into latex
+Here, the \lstinline{recover} combinator ``downgrades'' any failure, including hard and fatal failures, returned from the previous step to a soft failure. This solution is far easier to implement than the idiomatic solution and handles all possible user inputs.
