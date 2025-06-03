@@ -5,6 +5,7 @@ The correctness of the parsing, matching, and verification algorithms are verifi
 There is a high degree of confidence in the matching and verification algorithms, since they are based on custom data structures independent of the user input. To identify further edge cases in the parsing algorithm and determine how well the parsing algorithm adapts to a wide range of user inputs, the parsing algorithm is tested against extensions of the pre-defined systems and brand new proof systems.
 
 \subsection{Lambda calculus with pairs}
+\label{evaluation:lambda-pairs}
 The syntaxes of $\lambda$-terms and Curry types are extended with the following constructors \cite{van-bakel:2022}:
 \begin{align*}
     M, N &\Coloneqq \ldots \alt \langle M, N \rangle \alt \textsf{left}(M) \alt \textsf{right}(M) \\
@@ -18,12 +19,12 @@ Although the user can type ``left'' and ``right'' for the two constructors, they
 \begin{center}
     \lstinline|[Terminal("\textsf{left}"), Terminal("("), NonTerminal(...), Terminal(")")]|
 \end{center}
-A correct derivation using all three newly added constructors and type assignment rules is shown in \Cref{evaluation:lambda-with-pairs}.
+A correct derivation using all three newly added constructors and type assignment rules is shown in \Cref{fig:lambda-with-pairs}.
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.7\textwidth]{evaluation/lambda-with-pairs.png}
     \caption{A correct derivation }
-    \label{evaluation:lambda-with-pairs}
+    \label{fig:lambda-with-pairs}
 \end{figure}
 
 \subsection{\lbm{}}
@@ -66,3 +67,40 @@ where $A$ represents a Curry type, while $\Gamma$ and $\Delta$ represent a set o
         \endgroup
     \end{minipage}
 \end{center}
+
+\section{User experience}
+Students who took the Type Systems module in Autumn 2024 were invited to test the web application. They were asked to complete three tasks: the first task involves deriving a conclusion in the Curry type assignment system for the lambda calculus, the second task involves extending the lambda calculus and the Curry type assignment system, and the third task involves deriving a conclusion in the system \textsc{lk}.
+
+\subsection{User testing tasks}
+\subsubsection{Curry type assignment system for the lambda calculus}
+In this task, the user is asked to derive the conclusion
+\[
+    \varnothing \vdash ((\lambda x. x)(\lambda y. y))
+\]
+in the Curry type assignment system using the web application. This particular conclusion is chosen because it is fairly simple and its derivation requires all three type assignment rules $(Ax)$, $(\to I)$, and $(\to E)$.
+
+This task serves as a gentle introduction to the web application. The user only needs to focus on navigating the derivation building part of the web application and not other features, e.g. the syntax and inference rule editors. This task also serves as a quick refresher on building derivation trees, since the user testing was done around half a year after the Type Systems module had ended.
+
+The goal of this task is to evaluate the intuitiveness of the derivation building part of the web application. In particular, the evaluation focuses on how confident the users can input conclusions, rule names, and add premises without guidance, as well as the usefulness of the error messages when the user provides an incorrect derivation.
+
+\subsubsection{Lambda calculus with pairs}
+In this task, the user is asked to extend the syntax of $\lambda$-terms and type assignment rules with pairs, as described in \Cref{evaluation:lambda-pairs}. Afterwards, the user is asked to derive the following conclusion:
+\[
+    x: (1 \times 2) \vdash \langle \textsf{left}(x), \textsf{right}(x) \rangle: (1 \times 2)
+\]
+This particular conclusion is chosen because it is fairly simple and its derivation uses all three newly added type assignment rules.
+
+The goal of this task is to evaluate the intuitiveness of the syntax and inference rule editors. In particular, the evaluation focuses on how the users interact with the user interface to check the correctness of their definitions and the usefulness of the error messages and warnings.
+
+\subsubsection{Sequent calculus system \textsc{lk}}
+In this task, the user is asked to derive the following conclusion in the system \textsc{lk}:
+\[
+    ((x \lor y) \to z) \vdash (x \to z)
+\]
+This particular conclusion is chosen because its derivation requires the rule
+\[
+    (\to L): \frac{\Gamma \vdash A, \Delta \quad \Sigma, B \vdash \Pi}{\Gamma, \Sigma, (A \rightarrow B) \vdash \Delta, \Pi}
+\]
+which may appear quite complicated to users unfamiliar with the system \textsc{lk}, as they would need to pattern match numerous placeholders.
+
+The goal of this task is to evaluate the usefulness of the error messages in the derivation tree and the rule viewers in guiding the users to build a correct derivation in an unfamiliar proof system.
