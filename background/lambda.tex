@@ -77,7 +77,7 @@ $\lambda$-terms can be assigned types under Curry's type assignment system using
 \]
 A \textit{context} $\Gamma$ is a set of statements in the form $x:A$, where $x$ is a variable and $A$ is a Curry type. All variables are assigned at most one type in any context, so $x:1, x:2$ is not a well-formed context since $x$ appears twice.
 
-The syntax of a \textit{conclusion}\todo{Check with Steffen on terminology} in the form of $\Gamma \vdash M: A$ can be expressed in EBNF as follows:
+The syntax of a \textit{conclusion} in the form of $\Gamma \vdash M: A$ can be expressed in EBNF as follows:
 \begin{align*}
     \nonterm{conclusion} &\Coloneqq \nonterm{context} \vdash \nonterm{term} : \nonterm{type} \\
     \nonterm{context} &\Coloneqq \varnothing \alt \nonterm{varassignment} \{, \nonterm{varassignment} \} \\
