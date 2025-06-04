@@ -29,6 +29,12 @@
 \usepackage{cleveref}
 \usepackage{csquotes}
 
+% Display figures side by side
+\usepackage{subcaption}
+% https://tex.stackexchange.com/questions/218378/forcing-subfigures-to-have-same-height-and-take-overall-x-of-linewidth-in-latex
+\newlength{\twosubht}
+\newsavebox{\twosubbox}
+
 % Fancy headers
 \usepackage{fancyhdr}
 \newcommand{\maintitle}{Building derivations}
