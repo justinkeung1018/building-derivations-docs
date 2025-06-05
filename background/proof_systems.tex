@@ -1,0 +1,166 @@
+\section{Proof systems}
+This section presents an overview of three proof systems that are pre-defined in the web application, and on which most of the algorithm development is based.
+
+\subsection{Syntax}
+The definitions in this section are written 
+
+% The algorithms discussed in the subsequent chapters do not ``understand'' the semantics of the inference rules, whatever it means for an algorithm to ``understand''. Nonetheless, the reader may find it helpful to understand the intuition behind the inference rules, so that they can construct derivations by hand and compare the experience to using the web application.
+\subsection{Natural deduction}
+In 1934, Gerhard Gentzen proposed his system of natural deduction \cite{gentzen:1969}. This section considers a small subset of natural deduction which has $\to$ as its only logical connective. The syntax of terms in natural deduction is as follows:
+\[
+    A, B \Coloneqq x \alt (A \to B)
+\]
+The inference rules are defined as follows:
+{
+    \derivationfont
+    \[
+        (Ax): \frac{}{\Gamma, A \vdash A} \tquad (\arr I): \frac{\Gamma, A \vdash B}{\Gamma \vdash (A \to B)} \tquad (\arr E): \frac{\Gamma \vdash (A \to B) \quad \Gamma \vdash A}{\Gamma \vdash B}
+    \]
+}%
+Here, each \textit{statement} is in the form $\Gamma \vdash A$, where $\Gamma$ is a \textit{context} and $A$ is a term as defined above. A \textit{context} $\Gamma$ is an \textit{unordered} multiset of terms as defined above, i.e. it may contain duplicate terms. The notation $\Gamma, A$ is equivalent to the multiset union $\Gamma \cup \{ A \}$, which adds the term $A$ to $\Gamma$ regardless of whether $A$ appears in $\Gamma$.
+
+Of course, it is possible to extend the system with additional logical connectives. Each connective is associated with introduction rules ($\cdot I$) and elimination rules ($\cdot E$). An application of an introduction rule introduces the connective on the right of the turnstile, while an application of an elimination rule eliminates the connective on the right of the turnstile. For example, the subset above can easily be extended with the conjunction operator $\land$:
+{
+    \derivationfont
+    \[
+        (\land I): \frac{\Gamma \vdash A \quad \Gamma \vdash B}{\Gamma \vdash (A \land B)} \tquad (\land E_L): \frac{\Gamma \vdash (A \land B)}{\Gamma \vdash A} \tquad (\land E_R): \frac{\Gamma \vdash (A \land B)}{\Gamma \vdash B}
+    \]
+}%
+
+\subsubsection{Choice of notation}
+In Gentzen's original formulation \cite{gentzen:1969}, there are neither contexts nor turnstiles. Each statement only consists of a term. The $(\arr I)$ rule in the original formulation can refer to any term arbitrarily higher up. It is not \textit{localised}, since it does not always only depend on the premises and conclusion immediately above and below the dividing line. On the contrary, the formulation presented above is \textit{localised}, since all rules only depend on the premises and conclusion immediately above and below the dividing line. The differences between Gentzen's original formulation and the formulation above are highlighted in \Cref{fig:background:natural-deduction}.
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}{.48\textwidth}
+        \centering
+        \[
+            \Inf[\textcolor{ForestGreen}{\arr I^u}]
+                {\Inf[\textcolor{blue}{\arr I^v}]
+                     {\textcolor{blue}{[x]^v}
+                      \quad \Inf[\land E]
+                                {\textcolor{ForestGreen}{[x \land y]^u}
+                                }{y}
+                     }{\textcolor{blue}{x \to y}}
+                }{\textcolor{ForestGreen}{(x \land y) \to (x \to y)}}
+        \]
+        \caption{Gentzen's original formulation}
+    \end{subfigure}%
+    \quad
+    \begin{subfigure}{.48\textwidth}
+        \centering
+        \[
+            \Inf[\arr I]
+                {\Inf[\arr I]
+                     {\Inf[\land E_R]
+                          {\Inf[Ax]{x \land y, x \vdash x \land y}
+                          }{x \land y, x \vdash y}
+                     }{x \land y \vdash x \to y}
+                }{\varnothing \vdash (x \land y) \to (x \to y)}
+        \]
+        \caption{Localised formulation}
+    \end{subfigure}
+    \caption{An example derivation highlighting the differences between Gentzen's original formulation of natural deduction and a localised formulation}
+    \label{fig:background:natural-deduction}
+\end{figure}
+
+This project only considers \textit{localised} inference rules, since they are simpler to deal with and are applicable to a wider range of proof systems.
+
+\subsection{Simply typed \texorpdfstring{$\lambda$-calculus}{Lambda Calculus}}
+In the 1930s, Alonzo Church introduced the $\lambda$-calculus \cite{church:1936} as a model of computation that is Turing-complete \cite{turing:1937}. It is the basis of functional programming languages like Haskell, which all Computing students at Imperial are required to learn. The $\lambda$-calculus is taught as part of the mandatory second-year \textit{Models of Computation} module and the TSfPL elective.
+
+Church later formulated the simply typed $\lambda$-calculus \cite{church:1940}, which has only one type constructor $\to$ representing function types. This section focuses on type assignment in the manner of Haskell Curry \cite{curry:1934}. In Curry-style type assignment, types are assigned to entire $\lambda$-terms. In Church-style type assignment as presented in \cite{church:1940}, types are embedded as variable annotations. 
+
+\subsubsection{Why types?}
+\begin{itemize}
+    \item Types can guarantee the absence of certain errors. For example, the code snippet \lstinline{4.0 / "three"} will not compile in most statically-typed programming languages because \lstinline{"three"} is not a number. However, types can also reject programs that are well-behaved at run-time. For example, a conservative type system may reject the code snippet \lstinline{if true then 10 else "ten"} because \lstinline{10} and \lstinline{"ten"} have different types.
+    \item Type annotations can make code more readable. They help clarify the intended usage of variables and functions by supplementing information that are missing from names.
+    \item Types can enable certain compiler optimisations, such as using specialised machine instructions for arithmetic operations and determining whether a variable can be allocated on the stack. They allow the compiler to produce more efficient machine code.
+\end{itemize}
+
+\subsubsection{\texorpdfstring{$\lambda$}{Lambda}-terms}
+\label{lambda:lambda-terms}
+$\lambda$-terms are defined as follows \cite{church:1941}:
+\[
+    M,N \Coloneqq x \alt \underbracket[0.6pt]{(\lambda x. M)}_\text{abstraction} \alt \underbracket[0.6pt]{(MN)}_\text{application}
+\]
+where $x$ can be any symbol from an infinite list of term variables $a, b, c, \ldots, x, y, z \ldots$. Observe that abstractions and applications contain brackets to avoid ambiguity.
+
+\subsubsection{Curry types}
+\label{lambda:curry-types}
+The set of Curry \textit{types} is defined as follows \cite{van-bakel:2022}:
+\[
+    A, B \Coloneqq \varphi \alt (A \rightarrow B)
+\]
+where $\varphi$ can be any symbol from an infinite list of type variables $\varphi_1, \varphi_2, \ldots$. When writing type variables by hand, it is often more convenient to use the subscript alone to represent a type variable, e.g. the type $((1 \rightarrow 2) \rightarrow 1)$ represents the type $((\varphi_1 \rightarrow \varphi_2) \rightarrow \varphi_1)$.
+
+\subsubsection{Type assignment rules}
+\label{lambda:type-assignment}
+$\lambda$-terms can be assigned types under Curry's type assignment system using the following derivation rules \cite{van-bakel:2022}:
+{   
+    \derivationfont 
+    \[
+        (Ax): \frac{}{\Gamma, x:A \vdash x:A} \quad (\arr I): \frac{\Gamma, x:A \vdash M:B}{\Gamma \vdash \lambda x. M: (A \to B)} \quad (\arr E): \frac{\Gamma \vdash M: (A \to B) \quad \Gamma \vdash N: A}{\Gamma \vdash MN: (A \to B)}
+    \]
+}%
+A \textit{context} $\Gamma$ is a set containing elements in the form $x:A$, where $x$ is a variable and $A$ is a Curry type. All variables are assigned at most one type in any context. For example, $x:1, x:2$ is not a well-formed context since $x$ appears twice.
+
+\subsection{Sequent Calculus system \textsc{lk}} 
+In 1934, Gerhard Gentzen proposed the Sequent Calculus \textsc{lk} \cite{gentzen:1969}, which is used to build proofs for classical first-order logic.
+
+\subsubsection{Why the Sequent Calculus?}
+Derivations in the sequent calculus are similar to the type derivations in the Curry type assignment system and for Milner's \textsc{ml} in two ways. Firstly, they follow the same tree structure with premises at the top and the conclusion at the bottom of each node. Secondly, they can be constructed by a computer as long as the syntax of the inference rules is supplied. A computer does not need to ``understand'' the semantics of the rules to build a correct derivation.
+
+The sequent calculus is not taught to first-year students at Imperial, in favour of Fitch-style natural deduction. Although the rules of natural deduction are originally formulated in the familiar tree-like notation \cite{gentzen:1969}, they are more challenging to verify because a conclusion does not necessarily only follow from its immediate premises (i.e. the statements immediately above the dividing line), but may depend on assumptions made in a nested subtree.
+
+In short, adapting our tool to support the sequent calculus allows us to generalise our syntax of inference rules to classical logic without deviating much from the structure of the derivations we have seen so far.
+
+\subsubsection{Terms in propositional logic}
+The subset of propositional formulas relevant to this section are defined as follows:
+\[
+    A, B \Coloneqq x \alt (A \to B) \alt (A \land B) \alt (A \lor B) \alt (\lnot A)
+\]
+where $x$ can be any symbol from an infinite list of term variables $a, b, c, \ldots, x, y, z \ldots$ as before.
+
+\subsubsection{Inference rules in the system \textsc{lk} restricted to propositional logic}
+The inference rules are presented as follows:
+\vspace{-11pt}
+\begin{center}
+    \derivationfont
+    \begin{minipage}{.4\textwidth}
+        \begin{align*}
+            (Ax) &: \frac{}{A \vdash A} \\[1em]
+            (\land L_1) &: \frac{\Gamma, A \vdash \Delta}{\Gamma, (A \land B) \vdash \Delta} \\[1em]
+            (\land L_2) &: \frac{\Gamma, B \vdash \Delta}{\Gamma, (A \land B) \vdash \Delta} \\[1em]
+            (\arr L) &: \frac{\Gamma, A \vdash \Delta \quad \Gamma, B \vdash \Delta}{\Gamma, (A \lor B) \vdash \Delta} \\[1em]
+            (\arr L) &: \frac{\Gamma \vdash A, \Delta \quad \Sigma, B \vdash \Pi}{\Gamma, \Sigma, (A \to B) \vdash \Delta, \Pi} \\[1em]
+            (\lnot L) &: \frac{\Gamma \vdash A, \Delta}{\Gamma, (\lnot A) \vdash \Delta} \\[1em]
+            (WL) &: \frac{\Gamma \vdash \Delta}{\Gamma, A \vdash \Delta} \\[1em]
+            (CL) &: \frac{\Gamma, A, A \vdash \Delta}{\Gamma, A \vdash \Delta}
+        \end{align*}
+    \end{minipage}%
+    \begin{minipage}{.4\textwidth}
+        \begin{align*}
+            (Cut) &: \frac{\Gamma \vdash \Delta, A \quad A, \Sigma \vdash \Pi}{\Gamma, \Sigma \vdash \Delta, \Pi} \\[1em]
+            (\lor R_1) &: \frac{\Gamma \vdash A, \Delta}{\Gamma \vdash (A \lor B), \Delta} \\[1em]
+            (\lor R_2) &: \frac{\Gamma \vdash B, \Delta}{\Gamma \vdash (A \lor B), \Delta} \\[1em]
+            (\land R) &: \frac{\Gamma \vdash A, \Delta \quad \Gamma \vdash B, \Delta}{\Gamma \vdash (A \land B), \Delta} \\[1em]
+            (\arr R) &: \frac{\Gamma, A \vdash B, \Delta}{\Gamma \vdash (A \to B), \Delta} \\[1em]
+            (\lnot R) &: \frac{\Gamma, A \vdash \Delta}{\Gamma \vdash (\lnot A), \Delta} \\[1em]
+            (WR) &: \frac{\Gamma \vdash \Delta}{\Gamma \vdash A, \Delta} \\[1em]
+            (CR) &: \frac{\Gamma \vdash A, A, \Delta}{\Gamma \vdash A, \Delta}
+        \end{align*}
+    \end{minipage}
+\end{center}
+In the rules above, $A$ and $B$ represent propositional formulas as defined above, while $\Gamma$, $\Delta$, $\Sigma$, and $\Pi$ represent a possibly empty, unordered \textit{multiset} of propositional formulas. Note that $\Gamma$ in the simply typed $\lambda$-calculus is a \textit{set} (i.e. it cannot contain duplicates), while the $\Gamma$ here in the system \textsc{lk} is a \textit{multiset} (i.e. it can contain duplicates). Some formulations in the literature may include the following rules as well:
+{
+    \derivationfont
+    \[
+        (PL): \frac{\Gamma_1, A, B, \Gamma_2 \vdash \Delta}{\Gamma_1, B, A, \Gamma_2 \vdash \Delta} \tquad (PR): \frac{\Gamma \vdash \Delta_1, A, B, \Delta_2}{\Gamma \vdash \Delta_1, B, A, \Delta_2}
+    \]
+}%
+These additional rules are unnecessary in this project. They are necessary in those formulations because $\Gamma_1$, $\Gamma_2$, $\Delta_1$, and $\Delta_2$ are treated as \textit{ordered} sequences of propositional formulas, but not \textit{unordered} multisets.
+
+
+
+% Explain semantics of the rules, and reiterate our system doesn't need to understand the semantics, as long as it recognises the commas as unordered sets}

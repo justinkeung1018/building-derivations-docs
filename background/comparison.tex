@@ -1,0 +1,22 @@
+
+\section{What makes a learning tool enjoyable to use?}\label{background:enjoyable}
+In this section, we will discuss several learning tools for natural deduction in propositional and first-order logic, focusing on the features that make them enjoyable or not enjoyable to use.
+
+\subsection{Pandora}
+Pandora \cite{pandora:2007} is a tool that helps students learn Fitch-style natural deduction. The current version \cite{pandora} is written in Java by former Imperial students for their undergraduate capstone projects. At Imperial, it is presented during lectures in the first-year logic module.
+
+\subsubsection{Unnatural user interactions}
+Using detailed logs to keep track of clicks and other interactions with Pandora, \cite{pandora:2007} found that students made infrequent use of the help and tutorial functionalities, even though they often failed to apply the rules correctly. For example, many students did not select the necessary lines before applying a rule. We hypothesise that students make these frequent mistakes when using Pandora because the sequence of interactions for applying rules does not correspond to how they apply natural deduction rules when writing proofs by hand. Suppose a student wants to apply the $\rightarrow I$ rule to lines 1 and 2. The justification would look like $\rightarrow I(1, 2)$. It is natural to write it from left to right, starting from $\rightarrow I$, then perhaps one or both of the brackets, then writing the line number 1, and finally the line number 2. The natural translation of this sequence into Pandora interactions would be to first click on the $\rightarrow I$ rule, then click on line 1, and finally click on line 2. Clearly, there is a discrepancy between this sequence and the current design.
+
+Therefore, we should design our tool such that the interactions required to build derivations mimic as closely as possible how students would be producing assessed or marked work. The more similar they are, the less assistance and explanation is needed for students to use the tool correctly.
+
+\subsubsection{Installation required}
+Pandora is \textit{not} a web-based application. It can be run either as a JAR executable or using Java Web Start, a deprecated framework for starting Java applications using a web browser. The former starts up but fails to start a proof correctly and is essentially useless. The latter is not supported from Java 11 onwards \cite{oracle:2020}, and even with Java 8 installed, the application throws an error on startup saying it is ``unsigned'' on the author's machine. Whatever means needed to open a functional Pandora version, if possible at all, is simply too complicated.
+
+The last update of Pandora was more than 15 years ago, according to the timestamp ``200810031955'' on the website \cite{pandora}. No matter how carefully we choose our tech stack, we cannot guarantee how long native applications will work until it fails to be compatible with future hardware, or be as tedious to install for students two decades later as Pandora is today. A simple workaround is to build a web application. It does not require installation other than a suitable web browser and the current versions of the canonical web technologies---HTML, CSS, and JavaScript---should not cease to be forwards-compatible any time soon.
+
+\subsection{Carnap}
+Carnap \cite{carnap, carnap:2018} is an educational tool for a variety of formal reasoning systems and used by over 35 universities globally \cite{carnap:about}. It is written in Haskell and can be transpiled to JavaScript to be run on web browsers. The Carnap Book \cite{carnap:book} is a free web-based textbook with interactive widgets for practice problems on topics such as truth tables, formation trees, and natural deduction.
+
+\subsubsection{Clear layout of all syntactic rules}
+Although there are no syntax guides immediately surrounding the widgets in the textbook, the relevant syntax is introduced when a new widget first appears. This is natural when going through the textbook sequentially, but can be cumbersome for someone hoping to review exercises in later parts of the textbook but have forgotten the syntax. The input syntaxes for all formal systems supported by Carnap are enumerated on one webpage \cite{carnap:systems}, though it is somewhat unintuitive to access from the home page. It is possible that users may experience less friction if they can be quickly reminded of the input syntax in all situations.
