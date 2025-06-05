@@ -1,1 +1,56 @@
 \chapter{Conclusion}
+\section{Future work}
+\subsection{Bracketing conventions and abbreviations}
+One of the biggest limitations preventing the current web application from becoming a fully ergonomic and intuitive extension of writing derivations by hand is its inability to parse abbreviated terms, including terms that are not fully bracketed.
+
+When writing derivations by hand, we often drop the outermost parentheses and any parentheses that are implied by associativity conventions. For example, the Curry type $(1 \to (2 \to 3))$ is usually abbreviated as $1 \to 2 \to 3$, since $\to$ is right-associative. One solution may be to treat parentheses as special characters and let the user specify operator associativity whenever the definition contains a pair of parentheses. However, it is difficult to determine the operator within the input enclosed by the parentheses. Suppose the user adds symbols to the definition of Curry types:
+\[
+    A, B \Coloneqq \varphi \alt (A* \to{} +B)
+\]
+Unless the application treats $\to$ differently from $*$ and $+$, all three symbols are equally likely to be the principal connective in this case. Therefore, the application must either define a set of special symbols as operators or allow the user to specify the operator.
+
+A better solution is to let the user define rewriting rules that capture both associativity and the convention of dropping the outermost parentheses. In the case of Curry types, the user might specify
+\begin{align*}
+    (A \to (B \to C)) \quad &\to \quad A \to B \to C \\
+    (A \to B) \quad &\to \quad A \to B
+\end{align*}
+where the $\to$ in the middle means ``can be abbreviated as''. One way to preprocess the input according to the re-writing rules is as follows:
+\begin{enumerate}
+    \item Generate parsers for each of the abbreviations, i.e. the terms on the right of the $\to$.
+    \item Apply the abbreviation parsers from top to bottom and stop as soon as a parser succeeds.
+    \item Replace the abbreviation with the fully parenthesised form as specified on the left of the $\to$.
+    \item Repeat steps 2 to 3 until no more re-writing rules can be applied.
+    \item Proceed to the next part of the input.
+    \item Repeat steps 2 to 5 until all input is consumed.
+\end{enumerate}
+Once the input is fully preprocessed, it should be fully parenthesised and ready to be parsed in the manner described in the previous chapters. If the preprocessing algorithm is properly implemented, it should be able to accept both inference rule statements and user-inputted terms as input. 
+
+One issue with this solution is that preprocessing from left to right does not always produce the correct result. Consider the abbreviated term $1 \to 2 \to 3 \to 4$. When applied to this term, the preprocessing algorithm described above proceeds as follows:
+\begin{enumerate}
+    \item Apply the first re-writing rule to get $(1 \to (2 \to 3)) \to 4$.
+    \item Apply the second re-writing rule to get $((1 \to (2 \to 3)) \to 4)$.
+    \item Neither of the re-writing rules can be applied, so the algorithm terminates.
+\end{enumerate}
+However, the output should have been $(1 \to (2 \to (3 \to 4)))$ instead. The preprocessing algorithm would have obtained the correct output if it were applied from right to left, since the first step of the algorithm would have returned $1 \to (2 \to (3 \to 4))$.
+
+One way around this issue is to define a special symbol $\cdots$ meaning ``and so on''. The re-writing rules above can be simplified as the rule
+\[
+    (A_1 \to (A_2 \to \cdots (A_{n-1} \to A_n))) \quad \to \quad A_1 \to A_2 \to \cdots \to A_n
+\]
+But then the main difficulty becomes interpreting $\cdots$ correctly. Another way around this issue is to enumerate the re-writing rules up to a certain point and not handling any abbreviations beyond that point. For example, the user may choose to only handle abbreviations for Curry types with up to four arrows:
+\begin{align*}
+    (A \to (B \to (C \to (D \to E)))) \quad &\to \quad A \to B \to C \to D \to E \\
+    (A \to (B \to (C \to D))) \quad &\to \quad A \to B \to C \to D \\
+    (A \to (B \to C)) \quad &\to \quad A \to B \to C \\
+    (A \to B) \quad &\to \quad A \to B
+\end{align*}
+The latter workaround also works for abbreviations of abstractions in the lambda calculus, too. In general, the abstraction $(\lambda x_1. (\lambda x_2. \cdots (\lambda x_n. M)))$ can be abbreviated as $\lambda x_1 x_2 \cdots x_n. M$. Ideally, the abbreviation can be expressed by the following re-writing rule:
+\[
+     (\lambda var_1. (\lambda var_2. \cdots (\lambda var_n. M))) \quad \to \quad \lambda var_1 var_2 \cdots var_n. M
+\]
+But the same difficulty of interpreting $\cdots$ remains. Instead, enumerating abbreviations up to a certain number of variables would work well:
+\begin{align*}
+    (\lambda var_1. (\lambda var_2. (\lambda var_3. (\lambda var_4. (\lambda var_5. M))))) \quad &\to \quad \lambda var_1\ var_2\ var_3\ var_4\ var_5. M \\
+    &\vdotswithin{\to} \\
+    (\lambda var_1. M) \quad &\to \quad \lambda var_1. M
+\end{align*}
