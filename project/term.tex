@@ -1,9 +1,13 @@
-\chapter{Terms}
+\chapter{User-inputted terms}
 \label{chapter:term}
-Throughout this report, the word \textit{term} is used to refer to any instance or realisation of a syntax rule. For example, the term $((1 \to 2) \to 3)$ is an instance or realisation of the rule $A \Coloneqq 1 \alt 2 \alt 3 \alt (A \to A)$. The word is used without regards to the semantics of the syntax rules. For example, in the context of the $\lambda$-calculus, the aforementioned rule can be understood as the rule for a Curry type. A term can refer to any instance of a statement, a $\lambda$-term, and all other syntax rules defined by the user.
+In this report, a \textit{user-inputted term} refers to an instance or realisation of a syntax rule in the derivation tree. A \textit{user-inputted term} can correspond to a Curry type, a $\lambda$-term, a multiset of propositional formulas, or any syntax rule defined by the user. For example, $((1 \to 2) \to 3)$ is a valid user-inputted term corresponding to the rule $A \Coloneqq 1 \alt 2 \alt 3 \alt (A \to A)$, since it is a valid instance of the rule.
+
+A \textit{user-inputted statement} is a \textit{user-inputted term} corresponding to the syntax rule defining a statement.
+
+A valid derivation tree consists of valid user-inputted statements and rule names. The application must be able to verify whether each user-inputted statement conforms to the syntax rule defining a statement. This chapter describes the parsing algorithm that achieves this goal.
 
 \section{Generating term parsers}
-The aim of this step is to generate parsers for parsing terms, given as strings, into a list of abstract syntax trees (ASTs). One parser is generated for every syntax rule. Each parser outputs a list of ASTs. Each AST in the output list corresponds to a token in the parsed definition of the syntax rule. 
+The aim of this step is to generate parsers for parsing terms, given as strings, into a list of abstract syntax trees (ASTs). One parser is generated for every syntax rule. Each parser outputs a list of ASTs. Each AST in the output list corresponds to a token in the parsed definition of the syntax rule.
 
 \subsection{Abstract syntax trees (ASTs)}
 The ASTs are defined as follows:

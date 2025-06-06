@@ -1,5 +1,11 @@
 \chapter{Syntax rules}
 \label{chapter:syntax}
+Syntax rules define how well-formed input in a proof system should look like. Input that does not adhere to the syntax rules is considered nonsense and rejected by the system.
+
+Users may want to extend pre-existing proof systems with new syntactic constructs, or even define a new proof system from scratch. The web application must provide an interface for modifying syntax rules, check whether the syntax rules are defined sensibly, and be able to verify user input against an arbitrary set of syntax rules.
+
+\Cref{syntax:syntax} defines the syntax in which a user expresses a syntax rule in the application. \Cref{syntax:ui} gives an overview of the parts of the user interface of the web application for modifying syntax rules. \Cref{syntax:parsing} describes the procedure for transforming an arbitrary set of syntax rules into intermediate internal representations, in preparation for verifying user input against the syntax rules.
+
 \section{Syntax of syntax rules}
 \label{syntax:syntax}
 A syntax rule consists of:
@@ -16,8 +22,10 @@ The only special character in the definition of placeholders is the comma. The s
 A rule definition can refer to itself or other rules by their placeholders. In the definition of syntax rules, there is no difference using one placeholder over another to refer to the same rule. For example, given the placeholders \lstinline{A} and \lstinline{B} for a rule, the definitions \lstinline{(A -> A)}, \lstinline{(B -> B)}, \lstinline{(A -> B)}, and \lstinline{(B -> A)} are all identical. However, it is useful to have multiple placeholders because in inference rules, placeholders are treated as names representing concrete objects.
 
 \section{User interface}
+\label{syntax:ui}
 
 \section{Parsing syntax rules}
+\label{syntax:parsing}
 The aim of this step is to generate a list of \lstinline{Token}s for each rule alternative, and thus a two-dimensional array of \lstinline{Token}s for each rule definition. These \lstinline{Token}s will be used to generate term parsers, i.e. parsers for parsing instances of each rule.
 
 \subsection{Tokens}

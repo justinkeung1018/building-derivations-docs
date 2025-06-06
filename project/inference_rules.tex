@@ -1,6 +1,17 @@
 \chapter{Inference rules}
 \label{chapter:inference}
+Inference rules define the valid proof steps in a proof system. The application supports inference rules of the form
+\[
+    \Inf[\text{Rule name}]{\text{Premises}}{\text{Conclusion}}
+\]
+which lets us derive the conclusion if all the premises hold. Inference rules can use placeholders to match any user-inputted term. Inference rules can also destructure user-inputted terms and reject user-inputted terms that cannot be destructured according to the inference rule. The premises and conclusion of an inference rule are specialised statements that carry structural information and should be parsed more like user-inputted terms than syntax rules. These specialised statements are called \textit{inference rule statements}, consisting of \textit{inference rule terms}, which are either placeholders or destructurings of user-inputted terms.
+
+Like syntax rules, inference rules may be added, deleted, or replaced by the user. The web application must provide an interface for modifying inference rules, check whether the inference rules are defined sensibly, and be able to verify whether the user has applied an inference rule correctly.
+
+\Cref{inference:syntax} defines the syntax in which a user expresses an inference rule in the application, describes the concept of \textit{inference rule terms}, and contrasts it with \textit{user-inputted terms} introduced in the previous chapter. \Cref{inference:ui} gives an overview of the parts of the user interface for modifying inference rules. \Cref{inference:parsing} describes the procedure for transforming an arbitrary set of inference rules into intermediate internal representations, in preparation for verifying applications of the inference rules in the derivation tree.
+
 \section{Syntax of inference rules}
+\label{inference:syntax}
 An inference rule consists of:
 \begin{itemize}
     \item A \textbf{name},
@@ -9,7 +20,7 @@ An inference rule consists of:
 \end{itemize}
 Inference rules are \textit{local}: checking whether an inference rule is applied correctly only requires information immediately above and below the step of applying the inference rule, but not any information further up or down the derivation tree.
 
-\subsection{Inference rule terms and statements}
+\subsection{Terminology: inference rule terms and statements}
 In this report, an \textit{inference rule statement} refers to one of the premises or the conclusion of an inference rule. A term appearing in an inference rule statement may not always be a valid term when given by the user. Consider the following syntax rule:
 \[
     A, B \Coloneqq \varphi \alt (A \to B)
@@ -54,8 +65,10 @@ Note that a placeholder (in this case, $\Gamma$ or $\Delta$) can represent a mul
 \]
 instead, things like $\Gamma, A$ and $\Gamma, \Delta, A$ are not valid inference rule terms for the modified syntax rule. 
 \section{User interface}
+\label{inference:ui}
 
 \section{Parsing inference rules}
+\label{inference:parsing}
 The aim of this step is to generate parsers for parsing an inference rule statement into a list of \lstinline{Matchable} tokens.
 
 \subsection{\texorpdfstring{\lstinline{Matchable}}{Matchable} tokens}
