@@ -5,7 +5,7 @@
 A syntax rule consists of:
 \begin{itemize}
     \item a list of comma-separated \textbf{placeholders}, and
-    \item a \textbf{definition}, consisting of one or more non-empty alternatives separated by vertical bars \lstinline{|} 
+    \item a \textbf{definition}, consisting of one or more non-empty alternatives separated by vertical bars \lstinline{|}
 \end{itemize}
 In rule definitions, curly braces \lstinline|{}| represent a multiset. The structure of each element of a multiset is defined by the content enclosed within the curly braces. For example, the definition \lstinline|{ M: A }| represents a possibly empty collection of possibly duplicate elements following the structure \lstinline{M: A}.
 
@@ -87,7 +87,7 @@ The first set of each of the rules is computed as follows:
 \label{syntax:factorisation:nonterm}
 Consider the following syntax definition:
 \begin{align*}
-    \text{Statement} &\Coloneqq Ax \alt By \\ 
+    \text{Statement} &\Coloneqq Ax \alt By \\
     A &\Coloneqq x \alt Cz \alt z \\
     B &\Coloneqq x \alt y \alt w \\
     C &\Coloneqq y \alt w
@@ -141,7 +141,7 @@ Consider the following syntax definition:
     \text{Statement} &\Coloneqq \Gamma \vdash x \alt \Delta \vdash y \\
     \Gamma &\Coloneqq \{ Ax \} \\
     \Delta &\Coloneqq \{ By \} \\
-    A &\Coloneqq x \alt y \\ 
+    A &\Coloneqq x \alt y \\
     B &\Coloneqq x \alt z
 \end{align*}
 
