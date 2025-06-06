@@ -69,7 +69,7 @@ This project only considers \textit{localised} inference rules, since they are s
 \subsection{Simply typed \texorpdfstring{$\lambda$-calculus}{Lambda Calculus}}
 In the 1930s, Alonzo Church introduced the $\lambda$-calculus \cite{church:1936} as a model of computation that is Turing-complete \cite{turing:1937}. It is the basis of functional programming languages like Haskell, which all Computing students at Imperial are required to learn. The $\lambda$-calculus is taught as part of the mandatory second-year \textit{Models of Computation} module and the TSfPL elective.
 
-Church later formulated the simply typed $\lambda$-calculus \cite{church:1940}, which has only one type constructor $\to$ representing function types. This section focuses on type assignment in the manner of Haskell Curry \cite{curry:1934}. In Curry-style type assignment, types are assigned to entire $\lambda$-terms. In Church-style type assignment as presented in \cite{church:1940}, types are embedded as variable annotations. 
+Church later formulated the simply typed $\lambda$-calculus \cite{church:1940}, which has only one type constructor $\to$ representing function types. This section focuses on type assignment in the manner of Haskell Curry \cite{curry:1934}. In Curry-style type assignment, types are assigned to entire $\lambda$-terms. In Church-style type assignment as presented in \cite{church:1940}, types are embedded as variable annotations.
 
 \subsubsection{Why types?}
 \begin{itemize}
@@ -97,23 +97,16 @@ where $\varphi$ can be any symbol from an infinite list of type variables $\varp
 \subsubsection{Type assignment rules}
 \label{lambda:type-assignment}
 $\lambda$-terms can be assigned types under Curry's type assignment system using the following derivation rules \cite{van-bakel:2022}:
-{   
-    \derivationfont 
+{
+    \derivationfont
     \[
         (Ax): \frac{}{\Gamma, x:A \vdash x:A} \quad (\arr I): \frac{\Gamma, x:A \vdash M:B}{\Gamma \vdash \lambda x. M: (A \to B)} \quad (\arr E): \frac{\Gamma \vdash M: (A \to B) \quad \Gamma \vdash N: A}{\Gamma \vdash MN: (A \to B)}
     \]
 }%
 A \textit{context} $\Gamma$ is a set containing elements in the form $x:A$, where $x$ is a variable and $A$ is a Curry type. All variables are assigned at most one type in any context. For example, $x:1, x:2$ is not a well-formed context since $x$ appears twice.
 
-\subsection{Sequent Calculus system \textsc{lk}} 
-In 1934, Gerhard Gentzen proposed the Sequent Calculus \textsc{lk} \cite{gentzen:1969}, which is used to build proofs for classical first-order logic.
-
-\subsubsection{Why the Sequent Calculus?}
-Derivations in the sequent calculus are similar to the type derivations in the Curry type assignment system and for Milner's \textsc{ml} in two ways. Firstly, they follow the same tree structure with premises at the top and the conclusion at the bottom of each node. Secondly, they can be constructed by a computer as long as the syntax of the inference rules is supplied. A computer does not need to ``understand'' the semantics of the rules to build a correct derivation.
-
-The sequent calculus is not taught to first-year students at Imperial, in favour of Fitch-style natural deduction. Although the rules of natural deduction are originally formulated in the familiar tree-like notation \cite{gentzen:1969}, they are more challenging to verify because a conclusion does not necessarily only follow from its immediate premises (i.e. the statements immediately above the dividing line), but may depend on assumptions made in a nested subtree.
-
-In short, adapting our tool to support the sequent calculus allows us to generalise our syntax of inference rules to classical logic without deviating much from the structure of the derivations we have seen so far.
+\subsection{Sequent Calculus \textsc{lk}}
+In 1934, Gerhard Gentzen proposed the Sequent Calculus \textsc{lk} (standing for \textit{Logistische Kalkül}) \cite{gentzen:1969}, used to build proofs for classical first-order logic.
 
 \subsubsection{Terms in propositional logic}
 The subset of propositional formulas relevant to this section are defined as follows:
@@ -123,6 +116,20 @@ The subset of propositional formulas relevant to this section are defined as fol
 where $x$ can be any symbol from an infinite list of term variables $a, b, c, \ldots, x, y, z \ldots$ as before.
 
 \subsubsection{Inference rules in the system \textsc{lk} restricted to propositional logic}
+Each statement (or \textit{sequent}) takes the form
+\[
+    \Gamma \vdash \Delta
+\]
+where $\Gamma$ and $\Delta$ represent possibly empty, unordered \textit{multiset}s of propositional formulas. Note that $\Gamma$ in the simply typed $\lambda$-calculus is a \textit{set} (i.e. it cannot contain duplicates), while the $\Gamma$ and $\Delta$ here in the system \textsc{lk} is a \textit{multiset} (i.e. it can contain duplicates). When expanded, a statement in the system \textsc{lk} looks like this:
+\[
+    A_1, \ldots, A_n \vdash B_1, \ldots B_m
+\]
+where $n, m \geq 0$. It means ``if every $A_1, \ldots, A_n$ is true, then at least one of $B_1, \ldots, B_m$ is true''. Alternatively, a statement holds if and only if
+\[
+    (A_1 \land \cdots \land A_n) \vdash (B_1 \lor \cdots \lor B_m)
+\]
+holds.
+
 The inference rules are presented as follows:
 \vspace{-11pt}
 \begin{center}
@@ -152,15 +159,18 @@ The inference rules are presented as follows:
         \end{align*}
     \end{minipage}
 \end{center}
-In the rules above, $A$ and $B$ represent propositional formulas as defined above, while $\Gamma$, $\Delta$, $\Sigma$, and $\Pi$ represent a possibly empty, unordered \textit{multiset} of propositional formulas. Note that $\Gamma$ in the simply typed $\lambda$-calculus is a \textit{set} (i.e. it cannot contain duplicates), while the $\Gamma$ here in the system \textsc{lk} is a \textit{multiset} (i.e. it can contain duplicates). Some formulations in the literature may include the following rules as well:
+Here, $A$ and $B$ represent propositional formulas as defined above, while $\Gamma$, $\Delta$, $\Sigma$, and $\Pi$ represent multisets of propositional formulas. Some formulations in the literature may include the following rules as well:
 {
     \derivationfont
     \[
         (PL): \frac{\Gamma_1, A, B, \Gamma_2 \vdash \Delta}{\Gamma_1, B, A, \Gamma_2 \vdash \Delta} \tquad (PR): \frac{\Gamma \vdash \Delta_1, A, B, \Delta_2}{\Gamma \vdash \Delta_1, B, A, \Delta_2}
     \]
 }%
-These additional rules are unnecessary in this project. They are necessary in those formulations because $\Gamma_1$, $\Gamma_2$, $\Delta_1$, and $\Delta_2$ are treated as \textit{ordered} sequences of propositional formulas, but not \textit{unordered} multisets.
+These rules are unnecessary in this project. They are necessary in those formulations because $\Gamma_1$, $\Gamma_2$, $\Delta_1$, and $\Delta_2$ are treated as \textit{ordered} sequences of propositional formulas, but not \textit{unordered} multisets.
 
+\subsubsection{Why the Sequent Calculus?}
+Gentzen proved the cut-elimination theorem, also known as his \textit{Hauptsatz}, for the system \textsc{lk} \cite{gentzen:1969}. It states that any statement provable using the rule Cut in the system \textsc{lk} is provable without using the rule Cut.
 
+An important consequence of the cut-elimination theorem is that every statement provable in the system \textsc{lk} has a proof which has the \textit{subformula property}: every subformula in the statement is a subformula of at least one of its premises. This follows from the cut-elimination theorem, and the observation that in every rule except Cut, all subformulas in the premises appear in the conclusion.
 
-% Explain semantics of the rules, and reiterate our system doesn't need to understand the semantics, as long as it recognises the commas as unordered sets}
+The subformula property implies the consistency of the system \textsc{lk}. The system \textsc{lk} is inconsistent if and only if the empty sequent $\varnothing \vdash \varnothing$ is provable. The empty sequent is not an axiom and no rules except Cut can be applied to the empty sequent. There is no proof for the empty sequent with the subformula property, so it is not provable in the system \textsc{lk}.
