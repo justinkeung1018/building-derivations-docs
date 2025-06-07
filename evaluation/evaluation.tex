@@ -1,5 +1,10 @@
 \chapter{Evaluation}
+The application should be both reliable and intuitive to use. Here, reliability means the application correctly verifies a derivation if and only if the derivation is correct. If the application is not reliable, users may want to double-check their derivation by other means. If the application is not intuitive, users may need to spend more time learning how to use it. In both cases, users experience more friction and waste time on using the application, making the application less appealing than its humble competitor: pen and paper.
+
+\Cref{evaluation:correctness} describes how the algorithms are tested and refined to support a large range of proof systems. \Cref{evaluation:ux} discusses how user testing is done to evaluate the intuitiveness of the application, the findings of user testing, and the improvements made to address these findings.
+
 \section{Correctness of algorithms}
+\label{evaluation:correctness}
 The correctness of the parsing, matching, and verification algorithms are verified using unit tests. Some test cases are based on subsets of the pre-defined proof systems---natural deduction, Curry type assignment for the lambda calculus, and the sequent calculus system LK---while other test cases are based on variously modified rules from these systems and designed to catch edge cases. Some test cases based on the lambda calculus are taken from the course notes for the Type Systems module at Imperial \cite{van-bakel:2022}. Some test cases based on the system LK are taken from a set of online logic notes \cite{sequent}.
 
 There is a high degree of confidence in the matching and verification algorithms, since they are based on custom data structures independent of the user input. To identify further edge cases in the parsing algorithm and determine how well the parsing algorithm adapts to a wide range of user inputs, the parsing algorithm is tested against extensions of the pre-defined systems and brand new proof systems.
@@ -69,6 +74,7 @@ where $A$ represents a Curry type, while $\Gamma$ and $\Delta$ represent a set o
 \end{center}
 
 \section{User experience}
+\label{evaluation:ux}
 Three students who took the Type Systems module in autumn 2024 were invited to test the web application. User testing was conducted one-on-one over a video call. The users were asked to share their screens so that their interactions with the web application could be observed and analysed.
 
 At the beginning of each session, the users were all told two things: that the web application supported \LaTeX{} input, and that full bracketing was necessary. Afterwards, they were given minimal guidance and navigated the web application mostly on their own, except when they did not know certain \LaTeX{} syntax or had questions about the application.

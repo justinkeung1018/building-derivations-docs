@@ -1,7 +1,13 @@
 \chapter{Rule checking}
 \label{chapter:checking}
+As the user builds the derivation tree, the application checks whether the inference rules are applied correctly and whether the derivation is complete and correct. Since the application only supports \textit{localised} inference rules, it suffices to check at every dividing line of the derivation tree, whether the user-inputted premises immediately above the line and the user-inputted conclusion immediately below the line are compatible with the inference rule specified by the user-inputted rule name. A derivation is complete and correct if and only if all inference rules in the derivation are compatible with the user input.
+
+An inference rule is compatible with the user input if and only if there is a mapping of names (i.e. placeholders) to ASTs such that replacing all the names in the inference rule with the corresponding ASTs according to the mapping gives the user input. There can be many such mappings for a given inference rule and user input. Since the inference rules are localised, each mapping only applies to one application of an inference rule and need not apply to the rest of the derivation.
+
+\Cref{checking:matching} describes the procedure for obtaining a mapping of names to ASTs given a user-inputted statement and the structure of the corresponding inference rule statement. \Cref{checking:verifying} describes how the procedure described in \Cref{checking:matching} is used to check whether all user-inputted premises and the user-inputted conclusion are compatible with the inference rule.
 
 \section{Matching}
+\label{checking:matching}
 The aim of this step is to produce a mapping of names to ASTs. Matching is done individually to every inference rule statement.
 
 \subsection{Inputs and outputs of the matching algorithm}
@@ -69,7 +75,7 @@ For every \lstinline{MultisetElement} in \lstinline{token.elements}, find all \t
         \begin{center}
             \lstinline|unmatchedPossibilities[name] = { names1[name], names2[name], ... }|
         \end{center}
-    \end{enumerate} 
+    \end{enumerate}
 \end{itemize}
 
 \subsubsection{Finding actual elements compatible with a \texorpdfstring{\lstinline{MultisetElement}}{MultisetElement}}
@@ -83,7 +89,7 @@ Create an empty set of possibilities. For every actual element remaining in the 
 \end{enumerate}
 
 \section{Verifying}
-\label{section:verify}
+\label{checking:verifying}
 The aim of this step is to verify whether an inference rule is applied correctly by the user.
 
 \subsection{Procedure outline}
