@@ -1,22 +1,23 @@
 \chapter{Introduction}
-At Imperial, all first-year undergraduate students in Computing and Joint Mathematics and Computing are required to study propositional logic and first-order logic. Students are introduced to Pandora \cite{pandora:2007, pandora}, an interactive tool developed by former Imperial undergraduates for constructing Fitch-style natural deduction proofs. Interactive tools like Pandora can facilitate learning in numerous ways:
+Proof assistants, or interactive theorem provers, are software tools that help users create formal proofs. Although proof assistants like Rocq (formerly Coq) are used industrially to prove important mathematical results like the four colour theorem \cite{gonthier:2008}, this report focuses on their applications as educational tools.
 
-\paragraph{Instant feedback}
-Interactive tools provide instant feedback to students on the correctness of their proofs and derivations. Although lecturers can provide model answers to sample problems, there are often multiple correct solutions that would be tedious to exhaustively enumerate. Interactive tools ease the burden of teaching staff on verifying students' solutions. This is not to say they are unimportant in facilitating students' learning---they can help explain \textit{why} a proof or derivation is incorrect using various approaches \cite{nipkow:2012}; while interactive tools can also provide explanations to a certain degree, they are not necessarily tailored to the student's understanding.
+Proof assistants like Pandora \cite{pandora:2007, pandora}, Carnap \cite{carnap, carnap:2018}, Holbert \cite{oconnor:2022}, and Logitext \cite{yang:2022} are designed to help students learn logic. They help students learn by providing instant feedback on their proofs. Students at Imperial who used Pandora, a proof assistant for Fitch-style \cite{fitch:1952} natural deduction, were found to approach exam problems more methodically, were less likely to make arbitrary assumptions, and were more precise in their proofs \cite{pandora:2007}.
 
-\paragraph{More practice problems}
-In the Department of Computing at Imperial, students are not provided with mark schemes or model answers to past papers. Although students have access to past paper solutions crowdsourced from seniors and former students, the solutions may not be complete or correct, especially for older papers. Students can use interactive tools to check their solutions, even in the lack of model answers. This extends beyond past papers at Imperial. Arbitrary new problems in natural deduction can be generated \cite{ahmed:2013} for as much practice as students want.
+However, these educational proof assistants share several issues:
+\begin{itemize}
+    \item Each proof assistant supports a unique syntax. For example, the universal quantifier $\forall$ is represented by \lstinline{A} in Carnap \cite{carnap:systems}, \lstinline{all} in Holbert, and \lstinline{forall} in Logitext \cite{yang:2022}. Students need to learn unfamiliar syntax before they can use the proof assistants, yet this knowledge is not transferrable across proof assistants.
+    \item None of the proof assistants investigated in this report lets users modify proof systems arbitrarily in a user-friendly manner. Among them, Carnap supports the widest range of proof systems, including natural deduction for first-order logic \cite{carnap:systems}, the Sequent Calculus \cite{carnap:systems}, and possibly the simply typed $\lambda$-calculus\footnote{As of June 2025, the $\lambda$-calculus is not a pre-defined proof system in Carnap. However, Carnap-Core (the libraries which allow users to specify proof systems) supports proof systems with abstractions and applications \cite{carnap:2018}, so it should be able to support the simply typed $\lambda$-calculus.}. However, users must define proof systems via the core libraries written in Haskell and cannot modify proof systems on the fly.
+\end{itemize}
 
-\paragraph{Enforcing methodical approaches}
-Although students at Imperial who used Pandora scored similarly in the natural deduction parts of the final exam as those who did not use Pandora, the former approached the problems more methodically, were less likely to make arbitrary assumptions, and were more precise in their proofs \cite{pandora:2007}. This may be because Pandora makes it somewhat tedious to undo large parts of the proof by design. Even after adding the functionality to undo multiple proof steps as proposed in \cite{pandora:2007}, it is still more difficult than crossing out an erroneous solution on paper with a pen. This friction may prompt students to think more carefully before proceeding with the next proof step in Pandora, and with enough practice, on paper as well.
+This project presents a web-based educational proof assistant that addresses both issues:
+\begin{itemize}
+    \item Users can build derivations entirely using \LaTeX{} syntax. Although none of the proof assistants investigated uses \LaTeX{}, knowledge of \LaTeX{} is useful and highly transferrable beyond the proof assistant.
+    \item Users can modify proof systems on the fly without any understanding of the implementation details. All modifications can be done in the web application.
+\end{itemize}
 
-\mbox{}\\
-As beneficial as these interactive tools can be, there are relatively few tools for formal derivation systems beyond logic, such as type systems. This may be because most computer science students around the world are required to take courses on logic but not type systems\todo{citation needed}. At Imperial, \textit{Type Systems for Programming Languages} (TSfPL) is an elective module offered from the third year onwards.
-
-\section{Objectives}
-This project aims to develop an interactive, web-based learning tool for building derivation trees. It should be able to verify the correctness of the derivation tree and give hints on how to fix a derivation tree when it is malformed. The tool should also support user-defined inference rules.
-
-We will define a syntax for inference rules in extended Backus-Naur form (EBNF). Next, we will build a parser implementing the syntactic rules using parser combinator libraries. We will then define the semantics of the rules and ``compile'' the rules to verifiers that check whether the rule is applied correctly in a derivation tree. The correctness of our implementation will be checked against the type assignment systems in the Lambda Calculus and Milner's \textsc{ml}, as well as Gentzen's sequent calculus.
-
-% \section{Challenges}
-% \section{Contributions}
+\section{Contributions}
+The contribution of this project is a web application which has the following features:
+\begin{itemize}
+    \item Users can define syntax rules (\Cref{chapter:syntax}) and inference rules (\Cref{chapter:inference}). The application supports \LaTeX{} syntax and several shorthand notations.
+    \item Users can build derivations in the web application. The application verifies whether the derivation is correct according to the syntax and inference rules defined by the user (\Cref{chapter:checking}). Prior to verification, both the inference rules (\Cref{chapter:inference}) and the derivation inputted by the user (\Cref{chapter:term}) are transformed into intermediate internal representations.
+\end{itemize}
