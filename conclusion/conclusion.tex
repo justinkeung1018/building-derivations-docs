@@ -1,4 +1,15 @@
 \chapter{Conclusion}
+We have developed a web-based proof assistant which lets users define syntax and inference rules in \LaTeX{} and verifies derivations built in the web interface against the user-defined rules. To support these functionalities, we have devised algorithms for parsing syntax rules, inference rules, and user-inputted terms, as well as verifying derivations by matching names to ASTs. \Cref{fig:conclusion:flowchart} summarises the roles of the various algorithms in this project.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth]{conclusion/flowchart.png}
+    \caption{A flowchart showing the process of verifying whether an inference rule is applied correctly}
+    \label{fig:conclusion:flowchart}
+\end{figure}
+
+The algorithms were evaluated and refined by testing against example derivations in natural deduction, the simply typed $\lambda$-calculus, the system \textsc{lk}, the $\lambda$-calculus with pairs and product types, and the calculus \lbm. The user experience of the application was evaluated and refined by asking users to build derivations and observing their behaviour.
+
 \section{Future work}
 \subsection{Bracketing conventions and abbreviations}
 One of the biggest limitations preventing the current web application from becoming a fully ergonomic and intuitive extension of writing derivations by hand is its inability to parse abbreviated terms, including terms that are not fully bracketed.
@@ -23,7 +34,7 @@ where the $\to$ in the middle means ``can be abbreviated as''. One way to prepro
     \item Proceed to the next part of the input.
     \item Repeat steps 2 to 5 until all input is consumed.
 \end{enumerate}
-Once the input is fully preprocessed, it should be fully parenthesised and ready to be parsed in the manner described in the previous chapters. If the preprocessing algorithm is properly implemented, it should be able to accept both inference rule statements and user-inputted terms as input. 
+Once the input is fully preprocessed, it should be fully parenthesised and ready to be parsed in the manner described in the previous chapters. If the preprocessing algorithm is properly implemented, it should be able to accept both inference rule statements and user-inputted terms as input.
 
 One issue with this solution is that preprocessing from left to right does not always produce the correct result. Consider the abbreviated term $1 \to 2 \to 3 \to 4$. When applied to this term, the preprocessing algorithm described above proceeds as follows:
 \begin{enumerate}
@@ -54,3 +65,5 @@ But the same difficulty of interpreting $\cdots$ remains. Instead, enumerating a
     &\vdotswithin{\to} \\
     (\lambda var_1. M) \quad &\to \quad \lambda var_1. M
 \end{align*}
+
+\subsection{Using and proving lemmas}
