@@ -67,3 +67,73 @@ But the same difficulty of interpreting $\cdots$ remains. Instead, enumerating a
 \end{align*}
 
 \subsection{Using and proving lemmas}
+Suppose a user wants to prove the following conclusion in the system \textsc{lk}:
+\begin{equation}
+    \varnothing \vdash (((x \to y) \to x) \to x) \land (((y \to z) \to y) \to y)
+    \label{eqn:conclusion:peirce}
+\end{equation}
+The user can build the derivation as follows:
+\[
+    \Inf[\land R]{
+        \textcolor{ForestGreen}{\Inf[\arr R]{
+            \Inf[CR]{
+                \Inf[\arr L]{
+                    \Inf[\arr R]{
+                        \Inf[Ax]{x \vdash y, x}
+                    }{\varnothing \vdash (x \to y), x}
+                    \quad
+                    \Inf[Ax]{x \vdash x}
+                }{(x \to y) \to x \vdash x, x}
+            }{(x \to y) \to x \vdash x}
+        }{\varnothing \vdash ((x \to y) \to x) \to x}}
+        \quad
+        \textcolor{blue}{\Inf[\arr R]{
+            \Inf[CR]{
+                \Inf[\arr L]{
+                    \Inf[\arr R]{
+                        \Inf[Ax]{y \vdash z, y}
+                    }{\varnothing \vdash (y \to z), y}
+                    \quad
+                    \Inf[Ax]{y \vdash y}
+                }{(y \to z) \to y \vdash y, y}
+            }{(y \to z) \to y \vdash y}
+        }{\varnothing \vdash ((y \to z) \to y) \to y}}
+    }{\varnothing \vdash (((x \to y) \to x) \to x) \land (((y \to z) \to y) \to y)}
+\]
+Notice the \textcolor{ForestGreen}{green} and \textcolor{blue}{blue} sub-derivations are identical modulo renaming. It would be convenient to be able to turn the sub-derivation into a lemma, prove the lemma, and be able to use the lemma in another derivation. In this example, the lemma
+{
+    \derivationfont
+    \[
+        (\textsf{Peirce}): \frac{}{\varnothing \vdash ((var_1 \to var_2) \to var_1) \to var_1}
+    \]
+}%
+would be proven as follows:
+\[
+    \Inf[CR]{
+        \Inf[\arr L]{
+            \Inf[\arr R]{
+                \Inf[Ax]{var_1 \vdash var_2, var_1}
+            }{\varnothing \vdash (var_1 \to var_2), var_1}
+            \quad
+            \Inf[Ax]{var_1 \vdash var_1}
+        }{(var_1 \to var_2) \to var_1 \vdash var_1, var_1}
+    }{(var_1 \to var_2) \to var_1 \vdash var_1}
+\]
+The derivation for \ref{eqn:conclusion:peirce} could be simplified to
+\[
+    \Inf[\land R]{
+        {\Inf[\textsf{Peirce}]{\varnothing \vdash ((x \to y) \to x) \to x}}
+        \quad
+        \Inf[\textsf{Peirce}]{\varnothing \vdash ((y \to z) \to y) \to y}
+    }{\varnothing \vdash (((x \to y) \to x) \to x) \land (((y \to z) \to y) \to y)}
+\]
+Most of the work needed to support the use of lemmas is in extending the user interface. It would need to track lemmas and their proofs, since it currently only supports one derivation at a time. The algorithms and data structures can handle most backend tasks associated with the use of lemmas, since a lemma is essentially an inference rule associated with a proof, and the algorithms can handle both custom inference rules and verifying proofs. The only task left is to link the lemma with its proof, which can be done in one of two ways:
+\begin{itemize}
+    \item Construct the proof using placeholders (e.g. $var_1$ and $var_2$ instead of $x$ and $y$). Since placeholders are forbidden from user-inputted terms, a new parser is needed for parsing user-inputted terms and statements in lemma proofs. One way is to parse placeholders as strings and transform them into \lstinline{TerminalAST}s.
+    \item Construct the proof using user-inputted statements compatible with the structures of the statements in the lemma. For example, the lemma $(\textsf{Peirce})$ above may be proved by deriving the conclusion $\varnothing \vdash ((x \to y) \to x) \to x$ instead of $\varnothing \vdash ((var_1 \to var_2) \to var_1) \to var_1$. Matching user-inputted statements with the structure of a lemma requires more stringent checks than matching user-inputted statements with the structure of an inference rule when verifying proofs. For example, deriving the conclusion $\varnothing \vdash x \lor (\lnot x)$ does not prove the lemma
+    \[
+        (\textsf{LEM?}): \frac{}{\varnothing \vdash A \lor B}
+    \]
+    even though the conclusion is considered compatible with the structure of the conclusion when verifying proofs, since $A$ maps to $x$ and $B$ maps to $(\lnot x)$.
+\end{itemize}
+% A necessary additional check is to ensure distinct placeholders correspond to distinct user-inputted terms.
