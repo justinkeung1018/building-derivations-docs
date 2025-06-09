@@ -18,7 +18,7 @@ The syntaxes of $\lambda$-terms and Curry types are extended with the following 
 \end{align*}
 The three new constructors for $\lambda$-terms are accompanied with the following extensions to the type assignment rules:
 \[
-    (\textit{Pair}): \frac{\Gamma \vdash M: A \quad \Gamma \vdash N: B}{\Gamma \vdash \langle M, N \rangle: (A \times B)} \quad (\textsf{left}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{left}(M): A} \quad (\textsf{right}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{right}(M): B} 
+    (\textit{Pair}): \frac{\Gamma \vdash M: A \quad \Gamma \vdash N: B}{\Gamma \vdash \langle M, N \rangle: (A \times B)} \quad (\textsf{left}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{left}(M): A} \quad (\textsf{right}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{right}(M): B}
 \]
 Although the user can type ``left'' and ``right'' for the two constructors, they will be rendered in math mode in \LaTeX{} as $left$ and $right$, which do not look the nicest. Prior to testing with the lambda calculus with pairs, the parsing algorithm can only handle \LaTeX{} commands that do not take any arguments, such as ``\textbackslash Gamma'' for $\Gamma$ and ``\textbackslash varphi'' for $\varphi$. The lambda calculus with pairs motivates extending the parsing algorithm to parse \LaTeX{} commands as literal strings. In this case, ``\textbackslash textsf{left}(M)'' should be rendered as $\textsf{left}(M)$ and parsed into \lstinline{Token}s as
 \begin{center}
@@ -49,14 +49,14 @@ where $A$ represents a Curry type, while $\Gamma$ and $\Delta$ represent a set o
 \[
     (\textit{cut}): \frac{\Gamma \vdash t: A \alt \Delta \quad \Gamma \alt e: A \vdash \Delta}{\langle t|e \rangle: \Gamma \vdash \Delta}
 \]
-
+\vspace{-24pt}
 \begin{center}
     \begin{minipage}{.4\textwidth}
         \begingroup
         \addtolength{\jot}{1em}
         \begin{align*}
             (Ax_R)&: \frac{}{\Gamma, x: A \vdash x: A \alt \Delta} \\
-            (\to R)&: \frac{\Gamma, x: A \vdash t: B \alt \Delta}{\Gamma \vdash (\lambda x. t): (A \to B) \alt \Delta} \\
+            (\arr R)&: \frac{\Gamma, x: A \vdash t: B \alt \Delta}{\Gamma \vdash (\lambda x. t): (A \to B) \alt \Delta} \\
             (\mu)&: \frac{c: \Gamma \vdash \alpha: A, \Delta}{\Gamma \vdash (\mu \alpha. c): A \alt \Delta}
         \end{align*}
         \endgroup
@@ -66,7 +66,7 @@ where $A$ represents a Curry type, while $\Gamma$ and $\Delta$ represent a set o
         \addtolength{\jot}{1em}
         \begin{align*}
             (Ax_L)&: \frac{}{\Gamma \alt \alpha: A \vdash \alpha: A, \Delta} \\
-            (\to L)&: \frac{\Gamma \vdash t: A \alt \Delta \quad \Gamma \alt e: B \vdash \Delta}{\Gamma \alt (t \cdot e): (A \to B) \vdash \Delta} \\
+            (\arr L)&: \frac{\Gamma \vdash t: A \alt \Delta \quad \Gamma \alt e: B \vdash \Delta}{\Gamma \alt (t \cdot e): (A \to B) \vdash \Delta} \\
             (\tilde{\mu})&: \frac{c: \Gamma, x: A \vdash \Delta}{\Gamma \alt (\tilde{\mu}x. c): A \vdash \Delta}
         \end{align*}
         \endgroup
@@ -87,7 +87,7 @@ In this task, the user is asked to derive the conclusion
 \[
     \varnothing \vdash ((\lambda x. x)(\lambda y. y))
 \]
-in the Curry type assignment system using the web application. This particular conclusion is chosen because it is fairly simple and its derivation requires all three type assignment rules $(Ax)$, $(\to I)$, and $(\to E)$.
+in the Curry type assignment system using the web application. This particular conclusion is chosen because it is fairly simple and its derivation requires all three type assignment rules $(Ax)$, $(\arr I)$, and $(\arr E)$.
 
 This task serves as a gentle introduction to the web application. The user only needs to focus on navigating the derivation building part of the web application and not other features, e.g. the syntax and inference rule editors. This task also serves as a quick refresher on building derivation trees, since the user testing was done around half a year after the Type Systems module had ended.
 
@@ -109,7 +109,7 @@ In this task, the user is asked to derive the following conclusion in the system
 \]
 This particular conclusion is chosen because its derivation requires the rule
 \[
-    (\to L): \frac{\Gamma \vdash A, \Delta \quad \Sigma, B \vdash \Pi}{\Gamma, \Sigma, (A \rightarrow B) \vdash \Delta, \Pi}
+    (\arr L): \frac{\Gamma \vdash A, \Delta \quad \Sigma, B \vdash \Pi}{\Gamma, \Sigma, (A \rightarrow B) \vdash \Delta, \Pi}
 \]
 which may appear quite complicated to users unfamiliar with the system \textsc{lk}, as they would need to pattern match numerous placeholders.
 
