@@ -5,7 +5,7 @@ The application should be both reliable and intuitive to use. Here, reliability 
 
 \section{Correctness of algorithms}
 \label{evaluation:correctness}
-The correctness of the parsing, matching, and verification algorithms are verified using unit tests. Some test cases are based on subsets of the pre-defined proof systems---natural deduction, Curry type assignment for the lambda calculus, and the sequent calculus system LK---while other test cases are based on variously modified rules from these systems and designed to catch edge cases. Some test cases based on the lambda calculus are taken from the course notes for the Type Systems module at Imperial \cite{van-bakel:2022}. Some test cases based on the system LK are taken from a set of online logic notes \cite{sequent}.
+The correctness of the parsing, matching, and verification algorithms are verified using unit tests. Some test cases are based on subsets of the pre-defined proof systems---natural deduction, Curry type assignment for the $\lambda$-calculus, and the Sequent Calculus LK---while other test cases are based on variously modified rules from these systems and designed to catch edge cases. Some test cases based on the $\lambda$-calculus are taken from the course notes for the Type Systems module at Imperial \cite{van-bakel:2022}. Some test cases based on the system LK are taken from a set of online logic notes \cite{sequent}.
 
 There is a high degree of confidence in the matching and verification algorithms, since they are based on custom data structures independent of the user input. To identify further edge cases in the parsing algorithm and determine how well the parsing algorithm adapts to a wide range of user inputs, the parsing algorithm is tested against extensions of the pre-defined systems and brand new proof systems.
 
@@ -16,11 +16,11 @@ The syntaxes of $\lambda$-terms and Curry types are extended with the following 
     M, N &\Coloneqq \ldots \alt \langle M, N \rangle \alt \textsf{left}(M) \alt \textsf{right}(M) \\
     A, B &\Coloneqq \ldots \alt (A \times B)
 \end{align*}
-The three new constructors for $\lambda$-terms are accompanied with the following extensions to the type assignment rules:
+The three new constructors for $\lambda$-terms are accompanied by the following extensions to the type assignment rules:
 \[
     (\textit{Pair}): \frac{\Gamma \vdash M: A \quad \Gamma \vdash N: B}{\Gamma \vdash \langle M, N \rangle: (A \times B)} \quad (\textsf{left}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{left}(M): A} \quad (\textsf{right}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{right}(M): B}
 \]
-Although the user can type ``left'' and ``right'' for the two constructors, they will be rendered in math mode in \LaTeX{} as $left$ and $right$, which do not look the nicest. Prior to testing with the lambda calculus with pairs, the parsing algorithm can only handle \LaTeX{} commands that do not take any arguments, such as ``\textbackslash Gamma'' for $\Gamma$ and ``\textbackslash varphi'' for $\varphi$. The lambda calculus with pairs motivates extending the parsing algorithm to parse \LaTeX{} commands as literal strings. In this case, ``\textbackslash textsf{left}(M)'' should be rendered as $\textsf{left}(M)$ and parsed into \lstinline{Token}s as
+Although the user can type ``left'' and ``right'' for the two constructors, they will be rendered in math mode in \LaTeX{} as $left$ and $right$, which do not look the nicest. Prior to testing with the $\lambda$-calculus with pairs, the parsing algorithm can only handle \LaTeX{} commands that do not take any arguments, such as ``\textbackslash Gamma'' for $\Gamma$ and ``\textbackslash varphi'' for $\varphi$. The $\lambda$-calculus with pairs motivates extending the parsing algorithm to parse \LaTeX{} commands as literal strings. In this case, ``\textbackslash textsf{left}(M)'' should be rendered as $\textsf{left}(M)$ and parsed into \lstinline{Token}s as
 \begin{center}
     \lstinline|[Terminal("\textsf{left}"), Terminal("("), NonTerminal(...), Terminal(")")]|
 \end{center}
@@ -80,9 +80,9 @@ Three students who took the Type Systems module in autumn 2024 were invited to t
 At the beginning of each session, the users were all told two things: that the web application supported \LaTeX{} input, and that full bracketing was necessary. Afterwards, they were given minimal guidance and navigated the web application mostly on their own, except when they did not know certain \LaTeX{} syntax or had questions about the application.
 
 \subsection{User testing tasks}
-The users were asked to complete three tasks: the first task involves deriving a conclusion in the Curry type assignment system for the lambda calculus, the second task involves extending the lambda calculus and the Curry type assignment system, and the third task involves deriving a conclusion in the system \textsc{lk}.
+The users were asked to complete three tasks: the first task involves deriving a conclusion in the Curry type assignment system for the $\lambda$-calculus, the second task involves extending the $\lambda$-calculus and the Curry type assignment system, and the third task involves deriving a conclusion in the system \textsc{lk}.
 
-\subsubsection{Curry type assignment system for the lambda calculus}
+\subsubsection{Curry type assignment system for the $\lambda$-calculus}
 In this task, the user is asked to derive the conclusion
 \[
     \varnothing \vdash ((\lambda x. x)(\lambda y. y))
@@ -102,7 +102,7 @@ This particular conclusion is chosen because it is fairly simple and its derivat
 
 The goal of this task is to evaluate the intuitiveness of the syntax and inference rule editors. In particular, the evaluation focuses on how the users interact with the user interface to check the correctness of their definitions and the usefulness of the error messages and warnings.
 
-\subsubsection{Sequent calculus system \textsc{lk}}
+\subsubsection{Sequent calculus \textsc{lk}}
 In this task, the user is asked to derive the following conclusion in the system \textsc{lk}:
 \[
     ((x \lor y) \to z) \vdash (x \to z)
@@ -198,4 +198,4 @@ The solution is to display two types of errors: general errors regardless of whe
 \subsubsection{Persisting rules and derivations across reloads}
 Two users accidentally closed the tab for the web application during the second task, which required extending the syntax and inference rules. When they opened the application again, the rule definitions and derivation tree were reset since data was not persisted across reloads. Although the users could quickly re-input the rules in this case, it may be more frustrating in other cases when the user accidentally closes the page when defining larger and more complicated proof systems.
 
-The solution is to encode the definitions of the syntax and inference rules as query parameters in the URL and use the \lstinline{localStorage} property \cite{localstorage} to persist derivations across reloads. Though it is possible to store the rule definitions in \lstinline{localStorage} as well, the query parameters are already used to relay information about the rule definitions from the landing page to the derivation builder page. Suppose the rule definitions are only persisted in \lstinline{localStorage}. When the user chooses the pre-defined rules for the lambda calculus on the landing page, the URL query parameters encode this information and are passed to the derivation builder page, which parses the parameters and sets the rule definitions accordingly. If the user changes to those for the sequent calculus in the rule editor, then refreshes the page, the rule definitions and the query parameters become out of sync: the query parameters say the user wants to use the rules for the lambda calculus, yet the persisted rule definitions are actually those of the sequent calculus.
+The solution is to encode the definitions of the syntax and inference rules as query parameters in the URL and use the \lstinline{localStorage} property \cite{localstorage} to persist derivations across reloads. Though it is possible to store the rule definitions in \lstinline{localStorage} as well, the query parameters are already used to relay information about the rule definitions from the landing page to the derivation builder page. Suppose the rule definitions are only persisted in \lstinline{localStorage}. When the user chooses the pre-defined rules for the $\lambda$-calculus on the landing page, the URL query parameters encode this information and are passed to the derivation builder page, which parses the parameters and sets the rule definitions accordingly. If the user changes to those for the Sequent Calculus in the rule editor, then refreshes the page, the rule definitions and the query parameters become out of sync: the query parameters say the user wants to use the rules for the $\lambda$-calculus, yet the persisted rule definitions are actually those of the Sequent Calculus.
