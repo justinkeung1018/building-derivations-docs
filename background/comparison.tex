@@ -46,7 +46,7 @@ There is no syntax guide anywhere in the interactive version of the paper \cite{
 Several idiosyncrasies of Holbert's syntax make it unintuitive to use:
 \begin{itemize}
     \item Holbert uses prefix notation for infix binary operators. For example, the term $A \land B$ is inputted as \lstinline{_/\_ A B}. As the sentence becomes more complex, the syntax for typing it strays further away from how it appears. For example, $(x \land y) \to (x \to y)$ is inputted as \lstinline{_->_ (_/\_ x y) (_->_ x y)} in Holbert. Notice how far the outermost arrow in the input is from its position in the logical formula.
-    \item Holbert supports quantifiers and variable binding not by treating quantifiers as special symbols, but by treating the bound variable and the formula after it as a $\lambda$-abstraction. This leads to a somewhat confusing syntax for formulas with quantifiers: for example, $\forall (x. x)$ and $\exists (x. x)$ (the $\lambda$ is dropped from $\lambda$-abstractions).
+    \item Holbert supports quantifiers and variable binding not by treating quantifiers as special symbols, but by treating the bound variable and the formula after it as a $\lambda$-abstraction. This leads to a somewhat confusing syntax for formulae with quantifiers: for example, $\forall (x. x)$ and $\exists (x. x)$ (the $\lambda$ is dropped from $\lambda$-abstractions).
     \item Holbert supports pseudo-Gentzen-style natural deduction, in that the assumption is introduced in a premise immediately above the statement at which the assumption is discharged, along with a turnstile. \Cref{fig:comparison:holbert} illustrates the differences between Gentzen-style and Holbert-style natural deduction.
     \begin{figure}[!htbp]
         \centering

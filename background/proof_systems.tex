@@ -1,22 +1,35 @@
 \section{Proof systems}
 \label{background:proof-systems}
-This section presents an overview of three proof systems that are pre-defined in the web application, and on which most of the algorithm development is based.
+This section presents an overview of Natural Deduction \ndt{}, the simply typed $\lambda$-calculus, and the Sequent Calculus \textsc{lk}. that are pre-defined in the web application, and on which most of the algorithm development is based.
 
-\subsection{Natural deduction}
-In 1934, Gerhard Gentzen proposed his system of natural deduction \cite{gentzen:1969}. This section considers a small subset of natural deduction which has $\to$ as its only logical connective. The syntax of terms in natural deduction is as follows:
-\[
-    A, B \Coloneqq x \alt (A \to B)
-\]
-The inference rules are defined as follows:
-{
-    \derivationfont
+\subsection{Natural Deduction \texorpdfstring{\ndt{}}{with implication}}
+In 1934, Gerhard Gentzen introduced the Natural Deduction systems \textsc{nj} and \textsc{nk} \cite{gentzen:1969}. This section gives the definition of \ndt{}, a subsystem of Natural Deduction which has implication ($\to$) as the only logical connective.
+\begin{definition}[Formulae in \ndt{}]
+    The formulae for $\textsc{nd}_\to$ are:
     \[
-        (Ax): \frac{}{\Gamma, A \vdash A} \tquad (\arr I): \frac{\Gamma, A \vdash B}{\Gamma \vdash (A \to B)} \tquad (\arr E): \frac{\Gamma \vdash (A \to B) \quad \Gamma \vdash A}{\Gamma \vdash B}
+        A, B \Coloneqq x \alt (A \to B)
     \]
-}%
-Here, each \textit{statement} is in the form $\Gamma \vdash A$, where $\Gamma$ is a \textit{context} and $A$ is a term as defined above. A \textit{context} $\Gamma$ is an \textit{unordered} multiset of terms as defined above, i.e. it may contain duplicate terms. The notation $\Gamma, A$ is equivalent to the multiset union $\Gamma \cup \{ A \}$, which adds the term $A$ to $\Gamma$ regardless of whether $A$ appears in $\Gamma$.
+    where $x$ can be any symbol from an infinite list $a, b, c, \ldots, x, y, z \ldots$ of term variables.
+\end{definition}
+\begin{definition}[Contexts in \ndt{}]
+    A \textit{context} $\Gamma$ is an unordered multiset of formulae. The notation $\Gamma, A$ is equivalent to the multiset union $\Gamma \cup \{ A \}$, which adds the term $A$ to $\Gamma$ regardless of whether $A$ appears in $\Gamma$.
+\end{definition}
+\begin{definition}[Judgements in \ndt{}]
+    A \textit{judgement} (or \textit{statement}) takes the form $\Gamma \vdash A$. It means ``if all the formulae in $\Gamma$ hold, then $A$ holds''.
+\end{definition}
+\begin{definition}[Inference rules in \ndt{}]
+    The inference rules are defined as follows:
+    {
+        \derivationfont
+        \[
+            (Ax): \frac{}{\Gamma, A \vdash A} \tquad (\arr I): \frac{\Gamma, A \vdash B}{\Gamma \vdash (A \to B)} \tquad (\arr E): \frac{\Gamma \vdash (A \to B) \quad \Gamma \vdash A}{\Gamma \vdash B}
+        \]
+    }%
+\end{definition}
 
-Of course, it is possible to extend the system with additional logical connectives. Each connective is associated with introduction rules ($\cdot I$) and elimination rules ($\cdot E$). An application of an introduction rule introduces the connective on the right of the turnstile, while an application of an elimination rule eliminates the connective on the right of the turnstile. For example, the subset above can easily be extended with the conjunction operator $\land$:
+Of course, it is possible to extend the system with additional logical connectives. Each connective is associated with introduction rules ($\cdot I$), which describe how to construct a proof of the connective, and elimination rules ($\cdot E$), which describe how to use a connective. An introduction rule adds the connective to the right of the turnstile, while an elimination rule removes the connective from the right of the turnstile.
+
+For example, the system \ndt{} above can easily be extended with the conjunction operator ($\land$):
 {
     \derivationfont
     \[
@@ -64,110 +77,121 @@ In Gentzen's original formulation \cite{gentzen:1969}, there are neither context
 This project only considers \textit{localised} inference rules, since they are simpler to deal with and are applicable to a wider range of proof systems.
 
 \subsection{Simply typed \texorpdfstring{$\lambda$-calculus}{Lambda Calculus}}
-In the 1930s, Alonzo Church introduced the $\lambda$-calculus \cite{church:1936} as a model of computation that is Turing-complete \cite{turing:1937}. It is the basis of functional programming languages like Haskell, which all Computing students at Imperial are required to learn. The $\lambda$-calculus is taught as part of the mandatory second-year \textit{Models of Computation} module and the TSfPL elective.
+In the 1930s, Alonzo Church introduced the (untyped) $\lambda$-calculus \cite{church:1936} as a model of computation that is Turing-complete \cite{turing:1937}. It is the basis of functional programming languages like Haskell, \textsc{ml}, and Lisp.
 
-Church later formulated the simply typed $\lambda$-calculus \cite{church:1940}, which has only one type constructor $\to$ representing function types. This section focuses on type assignment in the manner of Haskell Curry \cite{curry:1934}. In Curry-style type assignment, types are assigned to entire $\lambda$-terms. In Church-style type assignment as presented in \cite{church:1940}, types are embedded as variable annotations.
+Church later formulated the simply typed $\lambda$-calculus \cite{church:1940}, which has only one type constructor, $A \to B$, representing function types. This section focuses on type assignment in the manner of Haskell Curry \cite{curry:1934}. In Curry-style type assignment (i.e. \textit{implicit} or \textit{extrinsic} typing), types are assigned to entire $\lambda$-terms. In Church-style type assignment (i.e. \textit{explicit} or \textit{intrinsic} typing) as presented in \cite{church:1940}, types are embedded as variable annotations.
 
 \subsubsection{Why types?}
-\begin{itemize}
-    \item Types can guarantee the absence of certain errors. For example, the code snippet \lstinline{4.0 / "three"} will not compile in most statically-typed programming languages because \lstinline{"three"} is not a number. However, types can also reject programs that are well-behaved at run-time. For example, a conservative type system may reject the code snippet \lstinline{if true then 10 else "ten"} because \lstinline{10} and \lstinline{"ten"} have different types.
-    \item Type annotations can make code more readable. They help clarify the intended usage of variables and functions by supplementing information that are missing from names.
-    \item Types can enable certain compiler optimisations, such as using specialised machine instructions for arithmetic operations and determining whether a variable can be allocated on the stack. They allow the compiler to produce more efficient machine code.
-\end{itemize}
+Types can guarantee the absence of certain errors. For example, the code snippet \lstinline{4.0 / "three"} will not compile in most statically-typed programming languages because \lstinline{"three"} is not a number. However, types can also reject programs that are well-behaved at run-time. For example, a conservative type system may reject the code snippet \lstinline{if true then 10 else "ten"} because \lstinline{10} and \lstinline{"ten"} have different types.
 
-\subsubsection{\texorpdfstring{$\lambda$}{Lambda}-terms}
-\label{lambda:lambda-terms}
-$\lambda$-terms are defined as follows \cite{church:1941}:
-\[
-    M,N \Coloneqq x \alt \underbracket[0.6pt]{(\lambda x. M)}_\text{abstraction} \alt \underbracket[0.6pt]{(MN)}_\text{application}
-\]
-where $x$ can be any symbol from an infinite list of term variables $a, b, c, \ldots, x, y, z \ldots$. Observe that abstractions and applications contain brackets to avoid ambiguity.
+Type annotations can make code more readable. They help clarify the intended usage of variables and functions by supplementing information that are missing from names.
 
-\subsubsection{Curry types}
-\label{lambda:curry-types}
-The set of Curry \textit{types} is defined as follows \cite{van-bakel:2022}:
-\[
-    A, B \Coloneqq \varphi \alt (A \rightarrow B)
-\]
-where $\varphi$ can be any symbol from an infinite list of type variables $\varphi_1, \varphi_2, \ldots$. When writing type variables by hand, it is often more convenient to use the subscript alone to represent a type variable, e.g. the type $((1 \rightarrow 2) \rightarrow 1)$ represents the type $((\varphi_1 \rightarrow \varphi_2) \rightarrow \varphi_1)$.
-
-\subsubsection{Type assignment rules}
-\label{lambda:type-assignment}
-$\lambda$-terms can be assigned types under Curry's type assignment system using the following derivation rules \cite{van-bakel:2022}:
-{
-    \derivationfont
+Types can enable certain compiler optimisations, such as using specialised machine instructions for arithmetic operations and determining whether a variable can be allocated on the stack. They allow the compiler to produce more efficient machine code.
+\begin{definition}[$\lambda$-terms]
+    \label{lambda:lambda-terms}
+    $\lambda$-terms are defined as follows \cite{church:1941}:
     \[
-        (Ax): \frac{}{\Gamma, x:A \vdash x:A} \quad (\arr I): \frac{\Gamma, x:A \vdash M:B}{\Gamma \vdash \lambda x. M: (A \to B)} \quad (\arr E): \frac{\Gamma \vdash M: (A \to B) \quad \Gamma \vdash N: A}{\Gamma \vdash MN: (A \to B)}
+        M,N \Coloneqq x \alt \underbracket[0.6pt]{(\lambda x. M)}_\text{abstraction} \alt \underbracket[0.6pt]{(MN)}_\text{application}
     \]
-}%
-A \textit{context} $\Gamma$ is a set containing elements in the form $x:A$, where $x$ is a variable and $A$ is a Curry type. All variables are assigned at most one type in any context. For example, $x:1, x:2$ is not a well-formed context since $x$ appears twice.
+    where $x$ can be any symbol from an infinite list $a, b, c, \ldots, x, y, z \ldots$ of term variables.
+\end{definition}
+\begin{definition}[Curry types]
+    \label{lambda:curry-types}
+    \textit{Curry types} (or \textit{simple types}) are defined as follows \cite{van-bakel:2022}:
+    \[
+        A, B \Coloneqq \varphi \alt (A \rightarrow B)
+    \]
+    where $\varphi$ can be any symbol from an infinite list $\varphi_1, \varphi_2, \ldots$ of type variables. When writing type variables by hand, it is often more convenient to use the subscript alone to represent a type variable, e.g. the type $((1 \rightarrow 2) \rightarrow 1)$ represents the type $((\varphi_1 \rightarrow \varphi_2) \rightarrow \varphi_1)$.
+\end{definition}
+\begin{definition}[Contexts in Curry type assignment]
+    A \textit{context} $\Gamma$ is a set containing elements in the form $x:A$, where $x$ is a variable and $A$ is a Curry type. All variables are assigned at most one type in any context. For example, $x:1, x:2$ is not a well-formed context since $x$ appears twice.
+\end{definition}
+\begin{definition}[Judgements in Curry type assignment]
+    A \textit{judgement} (or \textit{statement}) takes the form $\Gamma \vdash M: A$. It means ``given the type assignments to variables specified by $\Gamma$, the $\lambda$-term $M$ has type $A$''.
+\end{definition}
+\begin{definition}[Curry type assignment rules]
+    \label{lambda:type-assignment}
+    $\lambda$-terms can be assigned types under the Curry type assignment system using the following derivation rules \cite{van-bakel:2022}:
+    {
+        \derivationfont
+        \[
+            (Ax): \frac{}{\Gamma, x:A \vdash x:A} \quad (\arr I): \frac{\Gamma, x:A \vdash M:B}{\Gamma \vdash \lambda x. M: (A \to B)} \quad (\arr E): \frac{\Gamma \vdash M: (A \to B) \quad \Gamma \vdash N: A}{\Gamma \vdash MN: (A \to B)}
+        \]
+    }%
+\end{definition}
 
 \subsection{Sequent Calculus \textsc{lk}}
-In 1934, Gerhard Gentzen proposed the Sequent Calculus \textsc{lk} (standing for \textit{Logistische Kalkül}) \cite{gentzen:1969}, used to build proofs for classical first-order logic.
+At the same time as Natural Deduction, Gentzen also introduced the Sequent Calculus \textsc{lk} (standing for \textit{Logistische Kalkül}) \cite{gentzen:1969}, used to build proofs for classical first-order logic. This section considers the system \textsc{lk} restricted to propositional logic.
 
-\subsubsection{Terms in propositional logic}
-The subset of propositional formulas relevant to this section are defined as follows:
-\[
-    A, B \Coloneqq x \alt (A \to B) \alt (A \land B) \alt (A \lor B) \alt (\lnot A)
-\]
-where $x$ can be any symbol from an infinite list of term variables $a, b, c, \ldots, x, y, z \ldots$ as before.
-
-\subsubsection{Inference rules in the system \textsc{lk} restricted to propositional logic}
-Each statement (or \textit{sequent}) takes the form
+\begin{definition}[Propositional formulae]
+    The subset of propositional formulae relevant to this section are defined as follows:
+    \[
+        A, B \Coloneqq x \alt (A \to B) \alt (A \land B) \alt (A \lor B) \alt (\lnot A)
+    \]
+    where $x$ can be any symbol from an infinite list of term variables $a, b, c, \ldots, x, y, z \ldots$ as before.
+\end{definition}
+\begin{definition}[Judgements in \textsc{lk}]
+Each \textit{judgement} (or \textit{statement}, \textit{sequent}) takes the form
 \[
     \Gamma \vdash \Delta
 \]
-where $\Gamma$ and $\Delta$ represent possibly empty, unordered \textit{multiset}s of propositional formulas. Note that $\Gamma$ in the simply typed $\lambda$-calculus is a \textit{set} (i.e. it cannot contain duplicates), while the $\Gamma$ and $\Delta$ here in the system \textsc{lk} is a \textit{multiset} (i.e. it can contain duplicates). When expanded, a statement in the system \textsc{lk} looks like this:
-\[
+where $\Gamma$ and $\Delta$ represent possibly empty, unordered \textit{multiset}s of propositional formulae. Note that $\Gamma$ in the simply typed $\lambda$-calculus is a \textit{set} (i.e. it cannot contain duplicates), while the $\Gamma$ and $\Delta$ here in the system \textsc{lk} is a \textit{multiset} (i.e. it can contain duplicates). When expanded, a statement in the system \textsc{lk} looks like this:
+\begin{equation}
+    \label{eqn:background:sequent}
     A_1, \ldots, A_n \vdash B_1, \ldots B_m
-\]
-where $n, m \geq 0$. It means ``if every $A_1, \ldots, A_n$ is true, then at least one of $B_1, \ldots, B_m$ is true''. Alternatively, a statement holds if and only if
+\end{equation}
+where $n, m \geq 0$. It means ``if every $A_1, \ldots, A_n$ is true, then at least one of $B_1, \ldots, B_m$ is true''. Alternatively, the judgement \ref{eqn:background:sequent} holds if and only if
 \[
     (A_1 \land \cdots \land A_n) \vdash (B_1 \lor \cdots \lor B_m)
 \]
 holds.
-
-The inference rules are presented as follows:
-\vspace{-11pt}
-\begin{center}
-    \derivationfont
-    \begin{minipage}{.4\textwidth}
-        \begin{align*}
-            (Ax) &: \frac{}{A \vdash A} \\[1em]
-            (\land L_1) &: \frac{\Gamma, A \vdash \Delta}{\Gamma, (A \land B) \vdash \Delta} \\[1em]
-            (\land L_2) &: \frac{\Gamma, B \vdash \Delta}{\Gamma, (A \land B) \vdash \Delta} \\[1em]
-            (\arr L) &: \frac{\Gamma, A \vdash \Delta \quad \Gamma, B \vdash \Delta}{\Gamma, (A \lor B) \vdash \Delta} \\[1em]
-            (\arr L) &: \frac{\Gamma \vdash A, \Delta \quad \Sigma, B \vdash \Pi}{\Gamma, \Sigma, (A \to B) \vdash \Delta, \Pi} \\[1em]
-            (\lnot L) &: \frac{\Gamma \vdash A, \Delta}{\Gamma, (\lnot A) \vdash \Delta} \\[1em]
-            (WL) &: \frac{\Gamma \vdash \Delta}{\Gamma, A \vdash \Delta} \\[1em]
-            (CL) &: \frac{\Gamma, A, A \vdash \Delta}{\Gamma, A \vdash \Delta}
-        \end{align*}
-    \end{minipage}%
-    \begin{minipage}{.4\textwidth}
-        \begin{align*}
-            (Cut) &: \frac{\Gamma \vdash \Delta, A \quad A, \Sigma \vdash \Pi}{\Gamma, \Sigma \vdash \Delta, \Pi} \\[1em]
-            (\lor R_1) &: \frac{\Gamma \vdash A, \Delta}{\Gamma \vdash (A \lor B), \Delta} \\[1em]
-            (\lor R_2) &: \frac{\Gamma \vdash B, \Delta}{\Gamma \vdash (A \lor B), \Delta} \\[1em]
-            (\land R) &: \frac{\Gamma \vdash A, \Delta \quad \Gamma \vdash B, \Delta}{\Gamma \vdash (A \land B), \Delta} \\[1em]
-            (\arr R) &: \frac{\Gamma, A \vdash B, \Delta}{\Gamma \vdash (A \to B), \Delta} \\[1em]
-            (\lnot R) &: \frac{\Gamma, A \vdash \Delta}{\Gamma \vdash (\lnot A), \Delta} \\[1em]
-            (WR) &: \frac{\Gamma \vdash \Delta}{\Gamma \vdash A, \Delta} \\[1em]
-            (CR) &: \frac{\Gamma \vdash A, A, \Delta}{\Gamma \vdash A, \Delta}
-        \end{align*}
-    \end{minipage}
-\end{center}
-Here, $A$ and $B$ represent propositional formulas as defined above, while $\Gamma$, $\Delta$, $\Sigma$, and $\Pi$ represent multisets of propositional formulas. Some formulations in the literature may include the following rules as well:
-{
-    \derivationfont
-    \[
-        (PL): \frac{\Gamma_1, A, B, \Gamma_2 \vdash \Delta}{\Gamma_1, B, A, \Gamma_2 \vdash \Delta} \tquad (PR): \frac{\Gamma \vdash \Delta_1, A, B, \Delta_2}{\Gamma \vdash \Delta_1, B, A, \Delta_2}
-    \]
-}%
-These rules are unnecessary in this project. They are necessary in those formulations because $\Gamma_1$, $\Gamma_2$, $\Delta_1$, and $\Delta_2$ are treated as \textit{ordered} sequences of propositional formulas, but not \textit{unordered} multisets.
+\end{definition}
+\begin{definition}[Inference rules in \textsc{lk}]
+    The inference rules are presented as follows:
+    \vspace{-11pt}
+    \begin{center}
+        \derivationfont
+        \begin{minipage}{.4\textwidth}
+            \begin{align*}
+                (Ax) &: \frac{}{A \vdash A} \\[1em]
+                (\land L_1) &: \frac{\Gamma, A \vdash \Delta}{\Gamma, (A \land B) \vdash \Delta} \\[1em]
+                (\land L_2) &: \frac{\Gamma, B \vdash \Delta}{\Gamma, (A \land B) \vdash \Delta} \\[1em]
+                (\arr L) &: \frac{\Gamma, A \vdash \Delta \quad \Gamma, B \vdash \Delta}{\Gamma, (A \lor B) \vdash \Delta} \\[1em]
+                (\arr L) &: \frac{\Gamma \vdash A, \Delta \quad \Sigma, B \vdash \Pi}{\Gamma, \Sigma, (A \to B) \vdash \Delta, \Pi} \\[1em]
+                (\lnot L) &: \frac{\Gamma \vdash A, \Delta}{\Gamma, (\lnot A) \vdash \Delta} \\[1em]
+                (WL) &: \frac{\Gamma \vdash \Delta}{\Gamma, A \vdash \Delta} \\[1em]
+                (CL) &: \frac{\Gamma, A, A \vdash \Delta}{\Gamma, A \vdash \Delta}
+            \end{align*}
+        \end{minipage}%
+        \begin{minipage}{.4\textwidth}
+            \begin{align*}
+                (\textsf{Cut}) &: \frac{\Gamma \vdash \Delta, A \quad A, \Sigma \vdash \Pi}{\Gamma, \Sigma \vdash \Delta, \Pi} \\[1em]
+                (\lor R_1) &: \frac{\Gamma \vdash A, \Delta}{\Gamma \vdash (A \lor B), \Delta} \\[1em]
+                (\lor R_2) &: \frac{\Gamma \vdash B, \Delta}{\Gamma \vdash (A \lor B), \Delta} \\[1em]
+                (\land R) &: \frac{\Gamma \vdash A, \Delta \quad \Gamma \vdash B, \Delta}{\Gamma \vdash (A \land B), \Delta} \\[1em]
+                (\arr R) &: \frac{\Gamma, A \vdash B, \Delta}{\Gamma \vdash (A \to B), \Delta} \\[1em]
+                (\lnot R) &: \frac{\Gamma, A \vdash \Delta}{\Gamma \vdash (\lnot A), \Delta} \\[1em]
+                (WR) &: \frac{\Gamma \vdash \Delta}{\Gamma \vdash A, \Delta} \\[1em]
+                (CR) &: \frac{\Gamma \vdash A, A, \Delta}{\Gamma \vdash A, \Delta}
+            \end{align*}
+        \end{minipage}
+    \end{center}
+    Here, $A$ and $B$ represent propositional formulae as defined above, while $\Gamma$, $\Delta$, $\Sigma$, and $\Pi$ represent multisets of propositional formulae.
+\end{definition}
+\begin{remark}
+    Some formulations in the literature may include the following rules as well:
+    {
+        \derivationfont
+        \[
+            (PL): \frac{\Gamma_1, A, B, \Gamma_2 \vdash \Delta}{\Gamma_1, B, A, \Gamma_2 \vdash \Delta} \tquad (PR): \frac{\Gamma \vdash \Delta_1, A, B, \Delta_2}{\Gamma \vdash \Delta_1, B, A, \Delta_2}
+        \]
+    }%
+    These rules are unnecessary in this project. They are necessary in those formulations because $\Gamma_1$, $\Gamma_2$, $\Delta_1$, and $\Delta_2$ are treated as \textit{ordered} sequences of propositional formulae, but not \textit{unordered} multisets.
+\end{remark}
 
 \subsubsection{Why the Sequent Calculus?}
-Gentzen proved the cut-elimination theorem, also known as his \textit{Hauptsatz}, for the system \textsc{lk} \cite{gentzen:1969}. It states that any statement provable using the rule Cut in the system \textsc{lk} is provable without using the rule Cut.
+Gentzen proved the cut-elimination theorem, also known as his \textit{Hauptsatz}, for the system \textsc{lk} \cite{gentzen:1969}. It states that any statement provable using the rule (\textsf{Cut}) in the system \textsc{lk} is provable without using the rule (\textsf{Cut}).
 
-An important consequence of the cut-elimination theorem is that every statement provable in the system \textsc{lk} has a proof which has the \textit{subformula property}: every subformula in the statement is a subformula of at least one of its premises. This follows from the cut-elimination theorem, and the observation that in every rule except Cut, all subformulas in the premises appear in the conclusion.
+An important consequence of the cut-elimination theorem is that every statement provable in the system \textsc{lk} has a proof which has the \textit{subformula property}: every subformula in the statement is a subformula of at least one of its premises. This follows from the cut-elimination theorem, and the observation that in every rule except (\textsf{Cut}), all subformulae in the premises appear in the conclusion.
 
-The subformula property implies the consistency of the system \textsc{lk}. The system \textsc{lk} is inconsistent if and only if the empty sequent $\varnothing \vdash \varnothing$ is provable. The empty sequent is not an axiom and no rules except Cut can be applied to the empty sequent. There is no proof for the empty sequent with the subformula property, so it is not provable in the system \textsc{lk}.
+The subformula property implies the consistency of the system \textsc{lk}. The system \textsc{lk} is inconsistent if and only if the empty sequent $\varnothing \vdash \varnothing$ is provable. The empty sequent is not an axiom and no rules except (\textsf{Cut}) can be applied to the empty sequent. There is no proof for the empty sequent with the subformula property, so it is not provable in the system \textsc{lk}.

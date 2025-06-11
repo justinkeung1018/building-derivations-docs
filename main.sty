@@ -90,7 +90,8 @@
 \newcommand{\term}[1]{\text{ `#1' }}
 \newcommand{\alt}{\ |\ }
 
-% Lambda bar mu
+% Proof system abbreviations
+\newcommand{\ndt}{$\textsc{nd}_\to$}
 \newcommand{\lbm}{$\bar{\lambda}{\mu}{\tilde{\mu}}$}
 
 % Arrows for inference rule names (no spacing after the arrow)
@@ -149,3 +150,9 @@
 
 % Name of the web app
 \newcommand{\projectname}{Derivation Builder}
+
+% Definitions and remarks
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{remark}{Remark}[chapter]
