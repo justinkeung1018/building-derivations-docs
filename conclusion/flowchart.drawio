@@ -49,7 +49,7 @@
         <mxCell id="SJAbhvmzXAdhwkTG5RAE-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="SJAbhvmzXAdhwkTG5RAE-3" target="SJAbhvmzXAdhwkTG5RAE-11">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="SJAbhvmzXAdhwkTG5RAE-3" value="&lt;font&gt;Inference rule statement&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;fontFamily=libertine;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+        <mxCell id="SJAbhvmzXAdhwkTG5RAE-3" value="&lt;font&gt;abstract statement&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;fontFamily=libertine;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
           <mxGeometry x="600" y="320" width="161" height="40" as="geometry" />
         </mxCell>
         <mxCell id="SJAbhvmzXAdhwkTG5RAE-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="SJAbhvmzXAdhwkTG5RAE-4" target="SJAbhvmzXAdhwkTG5RAE-10">
@@ -101,7 +101,7 @@
         <mxCell id="SJAbhvmzXAdhwkTG5RAE-32" value="Matching algorithm" style="rhombus;whiteSpace=wrap;html=1;fontFamily=libertine;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
           <mxGeometry x="330" y="390" width="181" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="SJAbhvmzXAdhwkTG5RAE-35" value="For every pair of&lt;div&gt;(user-inputted statement, inference rule statement)&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=libertine;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+        <mxCell id="SJAbhvmzXAdhwkTG5RAE-35" value="For every pair of&lt;div&gt;(user-inputted statement, abstract statement)&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=libertine;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
           <mxGeometry x="257.5" y="310" width="326" height="30" as="geometry" />
         </mxCell>
         <mxCell id="SJAbhvmzXAdhwkTG5RAE-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="SJAbhvmzXAdhwkTG5RAE-48" target="SJAbhvmzXAdhwkTG5RAE-50">

@@ -21,18 +21,18 @@ An inference rule consists of:
 Inference rules are \textit{local}: checking whether an inference rule is applied correctly only requires information immediately above and below the step of applying the inference rule, but not any information further up or down the derivation tree.
 
 \subsubsection{Terminology: abstract terms and statements}
-In this report, an \textit{inference rule statement} refers to one of the premises or the conclusion of an inference rule. A term appearing in an inference rule statement may not always be a valid term when given by the user. Consider the following syntax rule:
+In this report, an \textit{abstract statement} refers to one of the premises or the conclusion of an inference rule. A term appearing in an abstract statement may not always be a valid term when given by the user. Consider the following syntax rule:
 \[
     A, B \Coloneqq \varphi \alt (A \to B)
 \]
-In a derivation, the user can only input terms like $\varphi$, $(\varphi \to \varphi)$, and $((\varphi \to \varphi) \to \varphi)$. In an inference rule, however, an instance of a syntax rule can be represented by any of its metavariables and partially expanded versions of its definition. In this case, $A$, $B$, $(A \to B)$, $((A \to B) \to A)$, and even $((B \to \varphi) \to B)$ are all valid \textit{abstract terms}. In this report, a \textit{(user-inputted) term} refers to an instance of a syntax rule that appears in derivations and an \textit{inference rule term} refers to an instance of a syntax rule that appears in an inference rule statement. All valid user-inputted are valid abstract terms, and so the set of abstract terms for any syntax definition with more than one non-statement rule is a strict superset of the set of user-inputted \textit{terms}\footnote{A syntax definition with only rules for statements does not have any metavariables, so the rule definitions cannot refer to any metavariables and must only consist of terminals and multisets. For such a syntax definition, the set of abstract terms is equal to the set of terms.}.
+In a derivation, the user can only input terms like $\varphi$, $(\varphi \to \varphi)$, and $((\varphi \to \varphi) \to \varphi)$. In an inference rule, however, an instance of a syntax rule can be represented by any of its metavariables and partially expanded versions of its definition. In this case, $A$, $B$, $(A \to B)$, $((A \to B) \to A)$, and even $((B \to \varphi) \to B)$ are all valid \textit{abstract terms}. In this report, a \textit{(user-inputted) term} refers to an instance of a syntax rule that appears in derivations and an \textit{abstract term} refers to an instance of a syntax rule that appears in an abstract statement. All valid user-inputted are valid abstract terms, and so the set of abstract terms for any syntax definition with more than one non-statement rule is a strict superset of the set of user-inputted \textit{terms}\footnote{A syntax definition with only rules for statements does not have any metavariables, so the rule definitions cannot refer to any metavariables and must only consist of terminals and multisets. For such a syntax definition, the set of abstract terms is equal to the set of terms.}.
 
 \paragraph{Metavariables in syntax rule definitions vs. abstract statements}
 Recall from \Cref{syntax:syntax} that in syntax rule definitions, metavariables for a rule can be used interchangeably. The following syntax rule is semantically identical to the example above:
 \[
     A, B \Coloneqq \varphi \alt (A \to A)
 \]
-Even though $A$ appears twice in different positions of the same alternative, the two concrete terms that take their positions can be different. For example, $(\varphi \to (\varphi \to \varphi))$ is a valid instance of both versions of the syntax rule. However, the inference rule term $(A \to A)$ is compatible with a user-inputted term if and only if the two user-inputted sub-terms that take the positions of the two occurrences of $A$ are identical. In this case, $(\varphi \to (\varphi \to \varphi))$ is incompatible with the inference rule term $(A \to A)$ because the sub-terms $\varphi$ and $(\varphi \to \varphi)$ are different. The process of matching abstract terms with concrete terms is explained in detail in \Cref{chapter:checking}.
+Even though $A$ appears twice in different positions of the same alternative, the two concrete terms that take their positions can be different. For example, $(\varphi \to (\varphi \to \varphi))$ is a valid instance of both versions of the syntax rule. However, the abstract term $(A \to A)$ is compatible with a user-inputted term if and only if the two user-inputted sub-terms that take the positions of the two occurrences of $A$ are identical. In this case, $(\varphi \to (\varphi \to \varphi))$ is incompatible with the abstract term $(A \to A)$ because the sub-terms $\varphi$ and $(\varphi \to \varphi)$ are different. The process of matching abstract terms with concrete terms is explained in detail in \Cref{chapter:checking}.
 
 \paragraph{Multisets in inference rules}
 \label{inference:multisets}
@@ -41,7 +41,7 @@ Consider the following syntax rules:
     \Gamma, \Delta &\Coloneqq \{ A \} \\
     A, B &\Coloneqq \varphi \alt (A \to B)
 \end{align*}
-On its own, $\Gamma$ represents a complete multiset. Now, consider the term $\Gamma, A$. $\Gamma$ represents a multiset with one element removed. The removed element is given the name $A$. Since an element can be removed, the user-inputted multiset must contain at least one element: trying to match the user-inputted term $\varnothing$ against the inference rule term $\Gamma, A$ results in an error. Note that $\Gamma$ can be empty. Analogously, it is possible to:
+On its own, $\Gamma$ represents a complete multiset. Now, consider the term $\Gamma, A$. $\Gamma$ represents a multiset with one element removed. The removed element is given the name $A$. Since an element can be removed, the user-inputted multiset must contain at least one element: trying to match the user-inputted term $\varnothing$ against the abstract term $\Gamma, A$ results in an error. Note that $\Gamma$ can be empty. Analogously, it is possible to:
 \begin{itemize}
     \item Match multiple multiset elements, such as $\Gamma, A, B$ and $\Gamma, A, A, A$.
     \item Match multiple multisets, such as $\Gamma, \Delta$.
@@ -67,10 +67,10 @@ instead, things like $\Gamma, A$ and $\Gamma, \Delta, A$ are not valid abstract 
 
 \subsection{Parsing inference rules}
 \label{inference:parsing}
-The aim of this step is to generate parsers for parsing an inference rule statement into a list of \lstinline{Matchable} tokens.
+The aim of this step is to generate parsers for parsing an abstract statement into a list of \lstinline{Matchable} tokens.
 
 \subsubsection{\texorpdfstring{\lstinline{Matchable}}{Matchable} tokens}
-\lstinline{Matchable} tokens are to inference rules like ASTs are to terms and \lstinline{Token}s are to syntax rules: they represent the structure of an inference rule statement. \lstinline{Matchable} tokens are defined as follows:
+\lstinline{Matchable} tokens are to inference rules like ASTs are to terms and \lstinline{Token}s are to syntax rules: they represent the structure of an abstract statement. \lstinline{Matchable} tokens are defined as follows:
 \begin{itemize}
     \item \begin{lstlisting}[style=ds]
         class MatchableTerminal { constructor(readonly value: string) {} }
@@ -86,7 +86,7 @@ The aim of this step is to generate parsers for parsing an inference rule statem
             constructor(readonly index: number, readonly children: Matchable[]) {}
         }
     \end{lstlisting}
-    Match an inference rule term corresponding to the syntax rule at \lstinline{index}. The structure of the inference rule term is given by the \lstinline{children} field.
+    Match an abstract term corresponding to the syntax rule at \lstinline{index}. The structure of the abstract term is given by the \lstinline{children} field.
     \item \begin{lstlisting}[style=ds]
         class MultisetElement { constructor(readonly tokens: Matchable[]) {} }
 
@@ -104,7 +104,7 @@ Finally, the \lstinline{Matchable} type is defined as
     \lstinline{type Matchable = MatchableTerminal | Name | MatchableNonTerminal | MatchableMultiset;}
 \end{center}
 \subsubsection{Procedure}
-Parsing abstract statements is extremely similar to parsing terms, as an inference rule statement can be thought of as an instance of a statement in a different context. As with generating term parsers, a delayed parser is created  for every syntax rule using the \lstinline{later} combinator. Each of these delayed parsers is instantiated by iterating over the tokens in every alternative of the syntax rule and examining the type of the token:
+Parsing abstract statements is extremely similar to parsing terms, as an abstract statement can be thought of as an instance of a statement in a different context. As with generating term parsers, a delayed parser is created  for every syntax rule using the \lstinline{later} combinator. Each of these delayed parsers is instantiated by iterating over the tokens in every alternative of the syntax rule and examining the type of the token:
 \begin{itemize}
     \item \lstinline{Terminal}: parse the string verbatim and wrap the result in a \lstinline{MatchableTerminal} token.
     \item \lstinline{NonTerminal}: either parse a metavariable of the rule corresponding to the rule number (i.e. the \lstinline{index} field of the \lstinline{NonTerminal}), or an expanded version of the definition of the syntax rule using the (delayed) parser corresponding to the rule. The former produces a \lstinline{Name} token while the latter produces a \lstinline{MatchableNonTerminal} token.

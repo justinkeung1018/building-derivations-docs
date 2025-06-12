@@ -4,11 +4,11 @@ As the user builds the derivation tree, the application checks whether the infer
 
 An inference rule is compatible with the user input if and only if there is a mapping of names (i.e. metavariables) to ASTs such that replacing all the names in the inference rule with the corresponding ASTs according to the mapping gives the user input. There can be many such mappings for a given inference rule and user input. Since the inference rules are localised, each mapping only applies to one application of an inference rule and need not apply to the rest of the derivation.
 
-\Cref{checking:matching} describes the procedure for obtaining a mapping of names to ASTs given a user-inputted statement and the structure of the corresponding inference rule statement. \Cref{checking:verifying} describes how the procedure described in \Cref{checking:matching} is used to check whether all user-inputted premises and the user-inputted conclusion are compatible with the inference rule.
+\Cref{checking:matching} describes the procedure for obtaining a mapping of names to ASTs given a user-inputted statement and the structure of the corresponding abstract statement. \Cref{checking:verifying} describes how the procedure described in \Cref{checking:matching} is used to check whether all user-inputted premises and the user-inputted conclusion are compatible with the inference rule.
 
 \section{Matching}
 \label{checking:matching}
-The aim of this step is to produce a mapping of names to ASTs. Matching is done individually to every inference rule statement.
+The aim of this step is to produce a mapping of names to ASTs. Matching is done individually to every abstract statement.
 
 \subsection{Inputs and outputs of the matching algorithm}
 The matching algorithm takes in two mappings as arguments and modifies them in place. The two mappings are:
@@ -16,13 +16,13 @@ The matching algorithm takes in two mappings as arguments and modifies them in p
     \item \lstinline{names}: a mapping where each entry maps a name (as a string) to an AST. A name \textit{must} be mapped to the AST according to \lstinline{names} if the inference rule is applied correctly.
     \item \lstinline{unmatchedPossibilities}: a mapping where each entry maps a name (as a string) that does not appear in \lstinline{names} to a set of ASTs. A name \textit{can} be mapped to any AST in the set according to \lstinline{unmatchedPossibilities} if the inference rule is applied correctly, yet it is not known which of the ASTs the name will ultimately end up getting mapped to at the time of matching.
 \end{itemize}
-The matching algorithm checks whether the mappings deduced from the user input and the structure of the inference rule statement are consistent with \lstinline{names} and \lstinline{unmatchedPossibilities}, and throws an error whenever it first finds an inconsistency.
+The matching algorithm checks whether the mappings deduced from the user input and the structure of the abstract statement are consistent with \lstinline{names} and \lstinline{unmatchedPossibilities}, and throws an error whenever it first finds an inconsistency.
 
 \subsection{Procedure outline}
 \label{matching:procedure}
 \begin{enumerate}
     \item Parse the user-inputted statement into a list of ASTs.
-    \item Check the list of ASTs has the same length as the list of \lstinline{Matchable} tokens in the inference rule statement.
+    \item Check the list of ASTs has the same length as the list of \lstinline{Matchable} tokens in the abstract statement.
     \item Pair up each AST with the corresponding \lstinline{Matchable} token and recursively match each pair.
     \item Repeat step 3 until no new names are added to \lstinline{names}.
 \end{enumerate}
@@ -84,7 +84,7 @@ Create an empty set of possibilities. For every actual element remaining in the 
     \item Check the actual element (which has type \lstinline{AST[]}) has the same length as the \lstinline{children} field of the \lstinline{MultisetElement}. In other words, check there are as many children ASTs representing the structure of the actual element as there are children \lstinline{Matchable} tokens representing the structure of the \lstinline{MultisetElement}.
     \item Check the actual element is not already in the set of possibilities. Recall the aim of finding compatible actual elements is to determine whether the \lstinline{MultisetElement} can be matched with an actual element with certainty. If the \lstinline{MultisetElement} is compatible with multiple identical actual elements, there is no difference between matching the \lstinline{MultisetElement} with one of the duplicates and matching it with any of the other duplicates, since any modifications to \lstinline{names} will be identical.
     \item Make a shallow copy of \lstinline{names}. The copy is a new mapping from names (as strings) to ASTs where the ASTs share the same references as in \lstinline{names}. Assigning a new name or removing an existing name of the shallow copy will not affect \lstinline{names}, but modifying any of the ASTs will cause the same changes in \lstinline{names}. A shallow copy is acceptable since the matching algorithm only adds names to \lstinline{names} and never modifies the ASTs in place.
-    \item Pair up each AST in the actual element with the corresponding \lstinline{Matchable} token of the \lstinline{MultisetElement}. Try to match each (AST, \lstinline{Matchable}) pair using the shallow copy of \lstinline{names}. A shallow copy of \lstinline{names} instead of \lstinline{names} is used because the matching may fail. The matching algorithm assumes the given AST \lstinline{must} be compatible with the given \lstinline{Matchable} token, so any error thrown indicates the user input is incorrect. This assumption is reasonable when matching at the top level, i.e. matching the user input with the structure of the inference rule statement, but less so when matching is used as a means to explore possibilities.
+    \item Pair up each AST in the actual element with the corresponding \lstinline{Matchable} token of the \lstinline{MultisetElement}. Try to match each (AST, \lstinline{Matchable}) pair using the shallow copy of \lstinline{names}. A shallow copy of \lstinline{names} instead of \lstinline{names} is used because the matching may fail. The matching algorithm assumes the given AST \lstinline{must} be compatible with the given \lstinline{Matchable} token, so any error thrown indicates the user input is incorrect. This assumption is reasonable when matching at the top level, i.e. matching the user input with the structure of the abstract statement, but less so when matching is used as a means to explore possibilities.
     \item If the matching succeeds, add the actual element to the set of possibilities.
 \end{enumerate}
 
@@ -101,7 +101,7 @@ Given a string representing the user-inputted conclusion, a list of strings repr
         \item Match the user-inputted conclusion with the structure of the conclusion as defined by the inference rule.
         \item Match each user-inputted premise with the structure of the corresponding premise as defined by the inference rule.
     \end{enumerate}
-    Here, the order of matching the abstract statements is arbitrary. Without analysing the structure of the inference rule, any matching order~ when given an arbitrary inference rule works equally well, since the matching algorithm is idempotent. For example, it is equally effective to match the premises before the conclusion or to match the premises in a random order. The matching steps are repeated for a similar reason as repeating step 3 in \Cref{matching:procedure}: matching a later inference rule statement may give more information for generating additional mappings when re-matching an earlier inference rule statement that cannot be generated on an earlier iteration.
+    Here, the order of matching the abstract statements is arbitrary. Without analysing the structure of the inference rule, any matching order~ when given an arbitrary inference rule works equally well, since the matching algorithm is idempotent. For example, it is equally effective to match the premises before the conclusion or to match the premises in a random order. The matching steps are repeated for a similar reason as repeating step 3 in \Cref{matching:procedure}: matching a later abstract statement may give more information for generating additional mappings when re-matching an earlier abstract statement that cannot be generated on an earlier iteration.
     \item If \lstinline{unmatchedPossibilities} is empty, verification succeeds if and only if none of the matching steps throws any errors.
     \item Otherwise, recursively explore all possible assignments of names to ASTs. Verification succeeds if and only if there is at least one assignment that does not result in any error when parsing.
 \end{enumerate}
