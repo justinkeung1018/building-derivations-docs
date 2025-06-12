@@ -27,7 +27,7 @@ In this report, an \textit{abstract statement} refers to one of the premises or 
 \]
 In a derivation, the user can only input concrete terms like $\varphi$, $(\varphi \to \varphi)$, and $((\varphi \to \varphi) \to \varphi)$. In an inference rule, however, the user can input abstract terms like $A$, $B$, $(A \to B)$, $((A \to B) \to A)$, and even $((B \to \varphi) \to B)$. An abstract term is either a metavariable of the corresponding rule, or partially expanded versions of its definition. For the syntax rule above, the following grammar specifies the set of abstract terms:
 \[
-    \varphi \alt (A \to B) \alt \text{``$A$''} \alt \text{``$B$''}
+    A_{abs}, B_{abs} \Coloneqq \varphi \alt (A_{abs} \to B_{abs}) \alt \text{``$A$''} \alt \text{``$B$''}
 \]
 
 All valid concrete terms are valid abstract terms.
