@@ -1,35 +1,45 @@
 \chapter{Evaluation}
-The application should be both reliable and intuitive to use. Here, reliability means the application correctly verifies a derivation if and only if the derivation is correct. If the application is not reliable, users may want to double-check their derivation by other means. If the application is not intuitive, users may need to spend more time learning how to use it. In both cases, users experience more friction and waste time on using the application, making the application less appealing than its humble competitor: pen and paper.
+\projectname{} should be both reliable and intuitive to use. Here, reliability means the application correctly verifies a derivation if and only if the derivation is correct. If the application is not reliable, users may want to double-check their derivation by other means. If the application is not intuitive, users may need to spend more time learning how to use it. In both cases, users experience more friction and waste time on using the application, making the application less appealing than its humble competitor: pen and paper.
 
-\Cref{evaluation:correctness} describes how the algorithms are tested and refined to support a large range of proof systems. \Cref{evaluation:ux} discusses how user testing is done to evaluate the intuitiveness of the application, the findings of user testing, and the improvements made to address these findings.
+\Cref{evaluation:correctness} describes how the algorithms are tested and refined to support a large range of proof systems. \Cref{evaluation:ux} discusses how user testing is done to evaluate the intuitiveness of \projectname{}, the findings of user testing, and the improvements made to address these findings.
 
 \section{Correctness of algorithms}
 \label{evaluation:correctness}
-The correctness of the parsing, matching, and verification algorithms are verified using unit tests. Some test cases are based on subsets of the pre-defined proof systems---natural deduction, Curry type assignment for the $\lambda$-calculus, and the Sequent Calculus LK---while other test cases are based on variously modified rules from these systems and designed to catch edge cases. Some test cases based on the $\lambda$-calculus are taken from the course notes for the Type Systems module at Imperial \cite{van-bakel:2022}. Some test cases based on the system LK are taken from a set of online logic notes \cite{sequent}.
+The correctness of the parsing, matching, and verification algorithms are verified using unit tests. Some test cases are based on the three pre-defined proof systems---Natural Deduction \ndt{}, Curry type assignment for the $\lambda$-calculus, and the system \textsc{lk}---while other test cases are based on variously modified rules from these systems and designed to catch edge cases. Some test cases based on the $\lambda$-calculus are taken from the course notes for the Type Systems module at Imperial \cite{van-bakel:2022}. Some test cases based on the system \textsc{lk} are taken from a set of online logic notes \cite{sequent}.
 
 There is a high degree of confidence in the matching and verification algorithms, since they are based on custom data structures independent of the user input. To identify further edge cases in the parsing algorithm and determine how well the parsing algorithm adapts to a wide range of user inputs, the parsing algorithm is tested against extensions of the pre-defined systems and brand new proof systems.
 
-\subsection{$\lambda$-calculus with pairs}
+\subsection{\lc{} with pairs}
 \label{evaluation:lambda-pairs}
-The syntaxes of $\lambda$-terms and Curry types are extended with the following constructors \cite{van-bakel:2022}:
-\begin{align*}
-    M, N &\Coloneqq \ldots \alt \langle M, N \rangle \alt \textsf{left}(M) \alt \textsf{right}(M) \\
-    A, B &\Coloneqq \ldots \alt (A \times B)
-\end{align*}
-The three new constructors for $\lambda$-terms are accompanied by the following extensions to the type assignment rules:
-\[
-    (\textit{Pair}): \frac{\Gamma \vdash M: A \quad \Gamma \vdash N: B}{\Gamma \vdash \langle M, N \rangle: (A \times B)} \quad (\textsf{left}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{left}(M): A} \quad (\textsf{right}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{right}(M): B}
-\]
-Although the user can type ``left'' and ``right'' for the two constructors, they will be rendered in math mode in \LaTeX{} as $left$ and $right$, which do not look the nicest. Prior to testing with the $\lambda$-calculus with pairs, the parsing algorithm can only handle \LaTeX{} commands that do not take any arguments, such as ``\textbackslash Gamma'' for $\Gamma$ and ``\textbackslash varphi'' for $\varphi$. The $\lambda$-calculus with pairs motivates extending the parsing algorithm to parse \LaTeX{} commands as literal strings. In this case, ``\textbackslash textsf{left}(M)'' should be rendered as $\textsf{left}(M)$ and parsed into \lstinline{Token}s as
+\begin{definition}[$\lambda$-terms and Curry types]
+    The syntaxes of $\lambda$-terms and Curry types are extended with the following constructors \cite{van-bakel:2022}:
+    \begin{align*}
+        M, N &\Coloneqq \ldots \alt \langle M, N \rangle \alt \textsf{left}(M) \alt \textsf{right}(M) \\
+        A, B &\Coloneqq \ldots \alt (A \times B)
+    \end{align*}
+\end{definition}
+\begin{definition}[Type assignment rules]
+    The three new constructors for $\lambda$-terms are accompanied by the following extensions to the type assignment rules:
+    \[
+        (\textsf{Pair}): \frac{\Gamma \vdash M: A \quad \Gamma \vdash N: B}{\Gamma \vdash \langle M, N \rangle: (A \times B)} \quad (\textsf{left}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{left}(M): A} \quad (\textsf{right}): \frac{\Gamma \vdash M: (A \times B)}{\Gamma \vdash \textsf{right}(M): B}
+    \]
+\end{definition}
+Although the user can type ``left'' and ``right'' for the two constructors, they will be rendered in math mode in \LaTeX{} as $left$ and $right$, which do not look the nicest. Prior to testing with the $\lambda$-calculus with pairs, the parsing algorithm can only handle \LaTeX{} commands that do not take any arguments, such as ``\textbackslash Gamma'' for $\Gamma$ and ``\textbackslash varphi'' for $\varphi$. The $\lambda$-calculus with pairs motivates extending the parsing algorithm to parse \LaTeX{} commands as literal strings. In this case, ``\lstinline|\textsf{left}(M)|'' should be rendered as $\textsf{left}(M)$ and parsed into \lstinline{Token}s as
 \begin{center}
     \lstinline|[Terminal("\textsf{left}"), Terminal("("), NonTerminal(...), Terminal(")")]|
 \end{center}
-A correct derivation using all three newly added constructors and type assignment rules is shown in \Cref{fig:lambda-with-pairs}.
+\Cref{fig:evaluation:lambda-with-pairs-definition} shows the definitions of syntax and inference rules in \projectname{}. \Cref{fig:evaluation:lambda-with-pairs-derivation} shows a derivation which uses all three new type assignment rules.
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.7\textwidth]{evaluation/lambda-with-pairs.png}
-    \caption{A correct derivation }
-    \label{fig:lambda-with-pairs}
+    \includegraphics[width=\textwidth]{evaluation/lambda-with-pairs-definition.png}
+    \caption{Definition of syntax and inference rules of $\lambda$-calculus with pairs in \projectname{}}
+    \label{fig:evaluation:lambda-with-pairs-definition}
+\end{figure}
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth]{evaluation/lambda-with-pairs-derivation.png}
+    \caption{Derivation in the $\lambda$-calculus with pairs in \projectname{}}
+    \label{fig:evaluation:lambda-with-pairs-derivation}
 \end{figure}
 
 \subsection{\texorpdfstring{\lbm{}}{Lambda bar mu}}
@@ -124,7 +134,7 @@ At the beginning of each session, the users were all told two things: that the w
 \subsection{User testing tasks}
 The users were asked to complete three tasks: the first task involves deriving a conclusion in the Curry type assignment system for the $\lambda$-calculus, the second task involves extending the $\lambda$-calculus and the Curry type assignment system, and the third task involves deriving a conclusion in the system \textsc{lk}.
 
-\subsubsection{Curry type assignment system for the $\lambda$-calculus}
+\subsubsection{Curry type assignment system for the \lc{}}
 In this task, the user is asked to derive the conclusion
 \[
     \varnothing \vdash ((\lambda x. x)(\lambda y. y))
@@ -135,7 +145,7 @@ This task serves as a gentle introduction to the web application. The user only 
 
 The goal of this task is to evaluate the intuitiveness of the derivation building part of the web application. In particular, the evaluation focuses on how confident the users can input conclusions, rule names, and add premises without guidance, as well as the usefulness of the error messages when the user provides an incorrect derivation.
 
-\subsubsection{Lambda calculus with pairs}
+\subsubsection{\lc{} with pairs}
 In this task, the user is asked to extend the syntax of $\lambda$-terms and type assignment rules with pairs, as described in \Cref{evaluation:lambda-pairs}. Afterwards, the user is asked to derive the following conclusion:
 \[
     x: (1 \times 2) \vdash \langle \textsf{left}(x), \textsf{right}(x) \rangle: (1 \times 2)
