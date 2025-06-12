@@ -1,5 +1,5 @@
 \chapter{Conclusion}
-We have developed a web-based proof assistant which lets users define syntax and inference rules in \LaTeX{} and verifies derivations built in the web interface against the user-defined rules. To support these functionalities, we have devised algorithms for parsing syntax rules, inference rules, and user-inputted terms, as well as verifying derivations by matching names to ASTs. \Cref{fig:conclusion:flowchart} summarises the roles of the various algorithms in this project.
+We have developed a web-based proof assistant which lets users define syntax and inference rules in \LaTeX{} and verifies derivations built in the web interface against the user-defined rules. To support these functionalities, we have devised algorithms for parsing syntax rules, inference rules, and concrete terms, as well as verifying derivations by matching names to ASTs. \Cref{fig:conclusion:flowchart} summarises the roles of the various algorithms in this project.
 
 \begin{figure}[!htbp]
     \centering
@@ -34,7 +34,7 @@ where the $\to$ in the middle means ``can be abbreviated as''. One way to prepro
     \item Proceed to the next part of the input.
     \item Repeat steps 2 to 5 until all input is consumed.
 \end{enumerate}
-Once the input is fully preprocessed, it should be fully parenthesised and ready to be parsed in the manner described in the previous chapters. If the preprocessing algorithm is properly implemented, it should be able to accept both inference rule statements and user-inputted terms as input.
+Once the input is fully preprocessed, it should be fully parenthesised and ready to be parsed in the manner described in the previous chapters. If the preprocessing algorithm is properly implemented, it should be able to accept both abstract statements and concrete terms as input.
 
 One issue with this solution is that preprocessing from left to right does not always produce the correct result. Consider the abbreviated term $1 \to 2 \to 3 \to 4$. When applied to this term, the preprocessing algorithm described above proceeds as follows:
 \begin{enumerate}
@@ -129,11 +129,11 @@ The derivation for \ref{eqn:conclusion:peirce} could be simplified to
 \]
 Most of the work needed to support the use of lemmas is in extending the user interface. It would need to track lemmas and their proofs, since it currently only supports one derivation at a time. The algorithms and data structures can handle most backend tasks associated with the use of lemmas, since a lemma is essentially an inference rule associated with a proof, and the algorithms can handle both custom inference rules and verifying proofs. The only task left is to link the lemma with its proof, which can be done in one of two ways:
 \begin{itemize}
-    \item Construct the proof using placeholders (e.g. $var_1$ and $var_2$ instead of $x$ and $y$). Since placeholders are forbidden from user-inputted terms, a new parser is needed for parsing user-inputted terms and statements in lemma proofs. One way is to parse placeholders as strings and transform them into \lstinline{TerminalAST}s.
-    \item Construct the proof using user-inputted statements compatible with the structures of the statements in the lemma. For example, the lemma $(\textsf{Peirce})$ above may be proved by deriving the conclusion $\varnothing \vdash ((x \to y) \to x) \to x$ instead of $\varnothing \vdash ((var_1 \to var_2) \to var_1) \to var_1$. Matching user-inputted statements with the structure of a lemma requires more stringent checks than matching user-inputted statements with the structure of an inference rule when verifying proofs. For example, deriving the conclusion $\varnothing \vdash x \lor (\lnot x)$ does not prove the lemma
+    \item Construct the proof using abstract statements and metavariables (e.g. $var_1$ and $var_2$ instead of $x$ and $y$). Since metavariables are forbidden in concrete terms, a new parser is needed for parsing concrete terms and statements in lemma proofs. One way is to parse metavariables as strings and transform them into \lstinline{TerminalAST}s.
+    \item Construct the proof using concrete statements compatible with the structures of the statements in the lemma. For example, the lemma $(\textsf{Peirce})$ above may be proved by deriving the conclusion $\varnothing \vdash ((x \to y) \to x) \to x$ instead of $\varnothing \vdash ((var_1 \to var_2) \to var_1) \to var_1$. Matching concrete statements with the structure of a lemma requires more stringent checks than matching concrete statements with the structure of an inference rule when verifying proofs. For example, deriving the conclusion $\varnothing \vdash x \lor (\lnot x)$ does not prove the lemma
     \[
         (\textsf{LEM?}): \frac{}{\varnothing \vdash A \lor B}
     \]
     even though the conclusion is considered compatible with the structure of the conclusion when verifying proofs, since $A$ maps to $x$ and $B$ maps to $(\lnot x)$.
 \end{itemize}
-% A necessary additional check is to ensure distinct placeholders correspond to distinct user-inputted terms.
+% A necessary additional check is to ensure distinct metavariables correspond to distinct concrete terms.

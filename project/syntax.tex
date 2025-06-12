@@ -15,7 +15,7 @@ A syntax rule consists of:
 \end{itemize}
 In rule definitions, curly braces \lstinline|{}| represent a multiset. The structure of each element of a multiset is defined by the content enclosed within the curly braces. For example, the definition \lstinline|{ M: A }| represents a possibly empty collection of possibly duplicate elements following the structure \lstinline{M: A}.
 
-Every valid syntax definition (i.e. collection of syntax rules) must contain at least one rule for a statement. A valid syntax definition can contain multiple rules for a statement. All non-statement rules must specify placeholders. Otherwise, there is no way to refer to the definition of such rules and they might as well be removed from the syntax definition.
+Every valid syntax definition (i.e. collection of syntax rules) must contain at least one rule for a statement. A valid syntax definition can contain multiple rules for a statement. All non-statement rules must specify metavariables. Otherwise, there is no way to refer to the definition of such rules and they might as well be removed from the syntax definition.
 
 The only special character in the definition of metavariables is the comma. The special characters in the definition of a syntax rule are the vertical bar \lstinline{|} and the curly braces \lstinline|{}|. Unlike in extended Backus-Naur form, characters like parentheses \lstinline{()} and brackets \lstinline{[]} do not carry any special meaning anywhere in this system and are no different from any other ordinary character. Certain groups of characters, such as \lstinline{|-} and \lstinline{->}, are treated as one symbol and shorthands for \LaTeX{} commands, such as \lstinline{\vdash} and \lstinline{\rightarrow}.
 
@@ -36,7 +36,7 @@ The tokens are defined as follows:
         S &\Coloneqq \ldots \\
         A, B &\Coloneqq \ldots
     \end{align*}
-    Then any occurrences of the placeholder $S$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 0 and any occurrences of either of the placeholders $A$ or $B$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 1.
+    Then any occurrences of the metavariable $S$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 0 and any occurrences of either of the metavariables $A$ or $B$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 1.
     \item \lstinline|class Multiset { constructor(readonly tokens: Token[]) {} }| \\
     The \lstinline{tokens} field of \lstinline{Multiset} defines the structure of an element of the multiset. For example, consider a rule definition that contains a multiset:
     \begin{align*}
@@ -156,18 +156,18 @@ Consider the following syntax definition:
 \end{align*}
 
 \subsection{Limitations}
-\subsubsection{Placeholders cannot be used as terminals}
+\subsubsection{Metavariables cannot be used as terminals}
 Suppose a user tries to define the syntax of $\lambda$-terms:
 \begin{align*}
     M, N &\Coloneqq x \alt (\lambda x. M) \alt (MN) \\
     x &\Coloneqq x \alt y \alt z
 \end{align*}
-The second rule is necessary as the system does not ``know'' $x$ in the first rule is a variable: if a character is not a placeholder, it is treated as a \lstinline{Terminal}. However, contrary to what the user expects, the $x$ in the first alternative of the second rule is interpreted as a reference to its own rule. Since it is the first token of the alternative, the alternative is considered left-recursive by the parsing algorithm and causes the parsing algorithm to throw an error. The current workaround to this issue is as follows:
+The second rule is necessary as the system does not ``know'' $x$ in the first rule is a variable: if a character is not a metavariable, it is treated as a \lstinline{Terminal}. However, contrary to what the user expects, the $x$ in the first alternative of the second rule is interpreted as a reference to its own rule. Since it is the first token of the alternative, the alternative is considered left-recursive by the parsing algorithm and causes the parsing algorithm to throw an error. The current workaround to this issue is as follows:
 \begin{align*}
     M, N &\Coloneqq var \alt (\lambda var. M) \alt (MN) \\
     var &\Coloneqq x \alt y \alt z
 \end{align*}
-The use of $var$ is unconventional and differs from most textbook formulations. However, there is no good way to tell the parsing algorithm to treat $x$ as a literal string instead of a placeholder depending on where it appears. One solution is to treat lowercase placeholders as literal strings if it appears in the definition of its own rule and placeholders otherwise. However, this solution not only makes the system prejudiced against certain inputs, but is also equally problematic. A frustrated user may find the following definition of Curry types to be interpreted rather unexpectedly:
+The use of $var$ is unconventional and differs from most textbook formulations. However, there is no good way to tell the parsing algorithm to treat $x$ as a literal string instead of a metavariable depending on where it appears. One solution is to treat lowercase metavariables as literal strings if it appears in the definition of its own rule and metavariables otherwise. However, this solution not only makes the system prejudiced against certain inputs, but is also equally problematic. A frustrated user may find the following definition of Curry types to be interpreted rather unexpectedly:
 \[
   a, b \Coloneqq \varphi \alt (a \to b)
 \]
