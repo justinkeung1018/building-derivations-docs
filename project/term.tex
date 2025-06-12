@@ -9,6 +9,76 @@ A valid derivation tree consists of valid concrete statements and rule names. \p
 \subsection{Parsing concrete terms}
 The aim of this step is to convert a term, given as a string, into a list of abstract syntax trees (ASTs). After parsing a syntax rule into \lstinline{Token}s, we generate a sub-parser for each \lstinline{Token} and combine the sub-parsers sequentially to form an overall parser. Each sub-parser outputs an AST, and the overall parser collects the ASTs from all sub-parsers into a list. The first AST is produced by the sub-parser corresponding to the first \lstinline{Token}, and so on.
 
+\subsubsection{Why a list of ASTs, but not a hierarchical structure?}
+% \projectname{} uses a flat list of ASTs to represent concrete terms because there is no notion of operator or symbol precedence. Consider the concrete term $(1 \to 2)$ and the corresponding syntax rule $A \Coloneqq 1 \alt 2 \alt (A \to A)$. If one were to manually write a parser, it may convert the concrete term into an AST node with the following structure:
+% \begin{center}
+%     \begin{forest}
+%         [$\to$
+%             [1]
+%             [2]
+%         ]
+%     \end{forest}
+% \end{center}
+% Here, we assume $\to$ should be at the root level because it is the main connective. In fact, it is the only connective. However, it is difficult to generalise the notion of a main connective to arbitrary syntax rules.
+Consider the following syntax rule:
+\[
+    \text{Statement} \Coloneqq M: A \to A
+\]
+where $M$ represents a $\lambda$-term and $A$ represents a Curry type. The concrete term $x: 1 \to 2$ can be represented as a tree in several ways:
+\begin{center}
+    \begin{adjustbox}{valign=m}
+        \begin{forest}
+            [:
+                [$x$]
+                [$\to$
+                    [1]
+                    [2]
+                ]
+            ]
+        \end{forest}
+    \end{adjustbox}
+    \tquad
+    or
+    \tquad
+    \begin{adjustbox}{valign=m}
+        \begin{forest}
+            [$\to$
+                [:
+                    [$x$]
+                    [1]
+                ]
+                [2]
+            ]
+        \end{forest}
+    \end{adjustbox}
+    \tquad
+    or
+    \tquad
+    \begin{adjustbox}{valign=m}
+        \begin{forest}
+            [$:\ \to$
+                [$x$]
+                [1]
+                [2]
+            ]
+        \end{forest}
+    \end{adjustbox}
+\end{center}
+The first representation is favoured when : has a lower precedence than $\to$, i.e. it binds less strongly than $\to$. The second representation is favoured when : has a higher precedence than $\to$. The third representation is favoured when : and $\to$ have equal precedence.
+
+\projectname{} assumes all symbols in a definition have equal precedence, i.e. it assumes the third representation. Any operator precedence should be reflected in the overall syntax definition. If the user wants : to have a lower precedence than $\to$ (i.e. they want the first representation), they should define the syntax rules as follows:
+\begin{align*}
+    \text{Statement} &\Coloneqq M: \nonterm{arrow} \\
+    \nonterm{arrow} &\Coloneqq A \to A
+\end{align*}
+Even assuming equal precedence, the third representation cannot accurately represent the term as is. It needs to store the positions of $x$, 1, and 2 relative to the symbols : and $\to$. Otherwise, consider the same tree and the modified syntax rule
+\[
+    \text{Statement} \Coloneqq M: A \to A \alt M\ A\ A :\ \to
+\]
+Without knowing the positions of $x$, 1, and 2 relative to the symbols, there is no way to determine whether the tree represents $x: 1 \to 2$ or $x\ 1\ 2:\ \to$, yet the syntax rule is clearly unambiguous.
+
+While the positions can be stored in the children nodes, the third representation offers no benefit over a flat list, which stores the positions and solves the problem automatically.
+
 \subsubsection{Abstract syntax trees (ASTs)}
 The ASTs are defined as follows:
 \begin{lstlisting}
