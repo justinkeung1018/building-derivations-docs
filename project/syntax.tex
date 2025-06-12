@@ -28,16 +28,22 @@ The aim of this step is to generate a list of \lstinline{Token}s for each rule a
 \subsubsection{Tokens}
 The tokens are defined as follows:
 \begin{itemize}
-    \item \lstinline|class Terminal { constructor(readonly value: string) {} }| \\
+    \item \begin{lstlisting}[style=ds]
+        class Terminal { constructor(readonly value: string) {} }
+    \end{lstlisting}
     A \lstinline{Terminal} represents a string.
-    \item \lstinline|class NonTerminal { constructor(readonly index: number) {} }| \\
+    \item \begin{lstlisting}[style=ds]
+        class NonTerminal { constructor(readonly index: number) {} }
+    \end{lstlisting}
     The \lstinline{index} field of \lstinline{NonTerminal} is the position of the rule referenced by the \lstinline{NonTerminal} in the ordered list of syntax rules. For example, if a syntax definition contains two rules
     \begin{align*}
         S &\Coloneqq \ldots \\
         A, B &\Coloneqq \ldots
     \end{align*}
     Then any occurrences of the metavariable $S$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 0 and any occurrences of either of the metavariables $A$ or $B$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 1.
-    \item \lstinline|class Multiset { constructor(readonly tokens: Token[]) {} }| \\
+    \item \begin{lstlisting}[style=ds]
+        class Multiset { constructor(readonly tokens: Token[]) {} }
+    \end{lstlisting}
     The \lstinline{tokens} field of \lstinline{Multiset} defines the structure of an element of the multiset. For example, consider a rule definition that contains a multiset:
     \begin{align*}
         S &\Coloneqq \{ var: A \}
