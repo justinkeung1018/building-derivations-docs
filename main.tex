@@ -8,14 +8,23 @@
 \begin{document}
 \input{title/title.tex}
 
-% \begin{abstract}
-% Your abstract goes here
-% \end{abstract}
+\begin{abstract}
+Proof assistants are tools that help users create and verify formal proofs. They have been used to help write reliable software, verify security protocols, and prove mathematical theorems.
 
-% \renewcommand{\abstractname}{Acknowledgements}
-% \begin{abstract}
-% Thanks mum!
-% \end{abstract}
+More recently, people have created proof assistants to teach logic. They are designed to be more intuitive for beginners than industrial-grade proof assistants, at the cost of expressive power and proving ability. However, these educational proof assistants  support their own syntax and cannot let users easily modify the proof system in which the derivations are built.
+
+\projectname{} addresses both of these issues. It is a web-based proof assistant which supports \LaTeX{} syntax and lets users modify the proof system through its web interface on the fly. Users can build derivation trees and arbitrarily modify the syntax and inference rules of the proof system. \projectname{} verifies the given derivation based on the proof system defined by the user.
+
+\end{abstract}
+
+\renewcommand{\abstractname}{Acknowledgements}
+\begin{abstract}
+I would like to thank my supervisor, Steffen van Bakel, for his support and invaluable feedback throughout this project. I seem to have come out of every meeting thinking a little sharper.
+
+I would also like to thank David Davies for his feedback on this report.
+
+Finally, I would like to thank my friends and family for their support.
+\end{abstract}
 
 \pagestyle{toc}
 \pagenumbering{roman}

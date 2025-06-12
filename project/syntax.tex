@@ -2,27 +2,24 @@
 \label{chapter:syntax}
 Syntax rules define how well-formed input in a proof system should look like. Input that does not adhere to the syntax rules is considered nonsense and rejected by the system.
 
-Users may want to extend pre-existing proof systems with new syntactic constructs, or even define a new proof system from scratch. The web application must provide an interface for modifying syntax rules, check whether the syntax rules are defined sensibly, and be able to verify user input against an arbitrary set of syntax rules.
+Users may want to extend pre-existing proof systems with new syntactic constructs, or even define a new proof system from scratch. \projectname{} provides an interface for modifying syntax rules, checks whether the syntax rules are defined sensibly, and verifies user input against an arbitrary set of syntax rules.
 
-\Cref{syntax:syntax} defines the syntax in which a user expresses a syntax rule in the application. \Cref{syntax:ui} gives an overview of the parts of the user interface of the web application for modifying syntax rules. \Cref{syntax:parsing} describes the procedure for transforming an arbitrary set of syntax rules into intermediate internal representations, in preparation for verifying user input against the syntax rules.
+\Cref{syntax:syntax} defines the syntax in which a user expresses a syntax rule in \projectname{}. \Cref{syntax:parsing} describes the procedure for transforming an arbitrary set of syntax rules into intermediate internal representations, in preparation for verifying user input against the syntax rules.
 
 \section{Syntax of syntax rules}
 \label{syntax:syntax}
 A syntax rule consists of:
 \begin{itemize}
-    \item a list of comma-separated \textbf{placeholders}, and
+    \item a list of comma-separated \textbf{metavariables}, and
     \item a \textbf{definition}, consisting of one or more non-empty alternatives separated by vertical bars \lstinline{|}
 \end{itemize}
 In rule definitions, curly braces \lstinline|{}| represent a multiset. The structure of each element of a multiset is defined by the content enclosed within the curly braces. For example, the definition \lstinline|{ M: A }| represents a possibly empty collection of possibly duplicate elements following the structure \lstinline{M: A}.
 
 Every valid syntax definition (i.e. collection of syntax rules) must contain at least one rule for a statement. A valid syntax definition can contain multiple rules for a statement. All non-statement rules must specify placeholders. Otherwise, there is no way to refer to the definition of such rules and they might as well be removed from the syntax definition.
 
-The only special character in the definition of placeholders is the comma. The special characters in the definition of a syntax rule are the vertical bar \lstinline{|} and the curly braces \lstinline|{}|. Unlike in extended Backus-Naur form, characters like parentheses \lstinline{()} and brackets \lstinline{[]} do not carry any special meaning anywhere in this system and are no different from any other ordinary character. Certain groups of characters, such as \lstinline{|-} and \lstinline{->}, are treated as one symbol and shorthands for \LaTeX{} commands, such as \lstinline{\vdash} and \lstinline{\rightarrow}.
+The only special character in the definition of metavariables is the comma. The special characters in the definition of a syntax rule are the vertical bar \lstinline{|} and the curly braces \lstinline|{}|. Unlike in extended Backus-Naur form, characters like parentheses \lstinline{()} and brackets \lstinline{[]} do not carry any special meaning anywhere in this system and are no different from any other ordinary character. Certain groups of characters, such as \lstinline{|-} and \lstinline{->}, are treated as one symbol and shorthands for \LaTeX{} commands, such as \lstinline{\vdash} and \lstinline{\rightarrow}.
 
-A rule definition can refer to itself or other rules by their placeholders. In the definition of syntax rules, there is no difference using one placeholder over another to refer to the same rule. For example, given the placeholders \lstinline{A} and \lstinline{B} for a rule, the definitions \lstinline{(A -> A)}, \lstinline{(B -> B)}, \lstinline{(A -> B)}, and \lstinline{(B -> A)} are all identical. However, it is useful to have multiple placeholders because in inference rules, placeholders are treated as names representing concrete objects.
-
-\section{User interface}
-\label{syntax:ui}
+A rule definition can refer to itself or other rules by their metavariables. In the definition of syntax rules, there is no difference using one metavariable over another to refer to the same rule. For example, given the metavariables \lstinline{A} and \lstinline{B} for a rule, the definitions \lstinline{(A -> A)}, \lstinline{(B -> B)}, \lstinline{(A -> B)}, and \lstinline{(B -> A)} are all identical. However, it is useful to have multiple metavariables because in inference rules, metavariables are treated as names representing concrete objects.
 
 \section{Parsing syntax rules}
 \label{syntax:parsing}
@@ -30,40 +27,42 @@ The aim of this step is to generate a list of \lstinline{Token}s for each rule a
 
 \subsection{Tokens}
 The tokens are defined as follows:
-\begin{lstlisting}
-    class Terminal { constructor(readonly value: string) {} }
-    class NonTerminal { constructor(readonly index: number) {} }
-    class Multiset { constructor(readonly tokens: Token[]) {} }
-
-    type Token = Terminal | NonTerminal | Multiset;
-\end{lstlisting}
-The \lstinline{index} field of \lstinline{NonTerminal} is the rule number of the placeholder. For example, if a syntax definition contains two rules
-\begin{align*}
-    S &\Coloneqq \ldots \\
-    A, B &\Coloneqq \ldots
-\end{align*}
-Then any occurrences of the placeholder $S$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 0 and any occurrences of either of the placeholders $A$ or $B$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 1.
-
-The \lstinline{tokens} field of \lstinline{Multiset} defines the structure of an element of the multiset. For example, consider a rule definition that contains a multiset:
-\begin{align*}
-    S &\Coloneqq \{ var: A \}
-\end{align*}
-Assuming $var$ and $A$ are placeholders, the rule definition is represented by a \lstinline{Multiset} with \lstinline{tokens} field set to something like \lstinline{[NonTerminal(...), Terminal(":"), NonTerminal(...)]}.
+\begin{itemize}
+    \item \lstinline|class Terminal { constructor(readonly value: string) {} }| \\
+    A \lstinline{Terminal} represents a string.
+    \item \lstinline|class NonTerminal { constructor(readonly index: number) {} }| \\
+    The \lstinline{index} field of \lstinline{NonTerminal} is the position of the rule referenced by the \lstinline{NonTerminal} in the ordered list of syntax rules. For example, if a syntax definition contains two rules
+    \begin{align*}
+        S &\Coloneqq \ldots \\
+        A, B &\Coloneqq \ldots
+    \end{align*}
+    Then any occurrences of the placeholder $S$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 0 and any occurrences of either of the placeholders $A$ or $B$ are represented by a \lstinline{NonTerminal} with \lstinline{index} 1.
+    \item \lstinline|class Multiset { constructor(readonly tokens: Token[]) {} }| \\
+    The \lstinline{tokens} field of \lstinline{Multiset} defines the structure of an element of the multiset. For example, consider a rule definition that contains a multiset:
+    \begin{align*}
+        S &\Coloneqq \{ var: A \}
+    \end{align*}
+    Assuming $var$ and $A$ are metavariables, the rule definition is represented by a \lstinline{Multiset} with the \lstinline{tokens} field set to \lstinline{[NonTerminal(...), Terminal(":"), NonTerminal(...)]}.
+\end{itemize}
+Finally, the \lstinline{Token} type is defined as
+\begin{center}
+    \lstinline*type Token = Terminal | NonTerminal | Multiset;*
+\end{center}
 
 \subsection{Procedure}
-The process consists of three steps.
+The process consists of three steps: splitting the metavariables and alternatives of the rule definitions, normalising them, and generating a parser for a rule alternative.
 
-\subsubsection{Splitting placeholders and alternatives of rule definitions}
-When the backend receives user input from the frontend, every rule is specified by a string representing the placeholders and a string representing the definition. The placeholder string is split on commas to give a list of placeholders. To preprocess the definition string, all occurrences of \lstinline{|-} are replaced with \lstinline{\vdash}, the \LaTeX{} command for a turnstile, then the string is split on vertical bars \lstinline{|} to give a list of alternatives. The replacement is necessary and correct as \lstinline{|-} contains a vertical bar \lstinline{|} while \lstinline{\vdash} does not.
+\subsubsection{Splitting metavariables and alternatives of rule definitions}
+When the backend receives user input from the frontend, every rule is specified by a string representing the metavariables and a string representing the definition. The metavariable string is split on commas to give a list of metavariables. To preprocess the definition string, all occurrences of \lstinline{|-} are replaced with \lstinline{\vdash}, the \LaTeX{} command for a turnstile, then the string is split on vertical bars \lstinline{|} to give a list of alternatives. The replacement is necessary and correct as \lstinline{|-} contains a vertical bar \lstinline{|} while \lstinline{\vdash} does not.
 
-\subsubsection{Normalise placeholders and rule definitions}
+\subsubsection{Normalise metavariables and rule definitions}
 Aliases of a symbol are unified. For example, the symbol for an arrow \lstinline{->} can be represented by \lstinline{\rightarrow}, \lstinline{\to}, \lstinline{->}, and the Unicode character →. In this case, all aliases are replaced with \lstinline{->} (other than having the fewest characters and better readability, the choice is entirely arbitrary). Prior to the replacements, a space is added after all substrings that resemble a \LaTeX{} command, i.e. any substring beginning with \lstinline{\} and a string of non-whitespace characters. This ensures we do not accidentally replace parts of a \LaTeX{} command and e.g. turn \lstinline{\toI} into \lstinline{->I}. The user may have intended the latter, but the former is a typo nonetheless.
 
 \subsubsection{Generate parser}
 The parser outputs three types of tokens: \lstinline{Terminal}, \lstinline{NonTerminal}, and \lstinline{Multiset}. The final parser tries to match a non-terminal, then (if it fails) a multiset, then (if both fail) a terminal. Each of these sub-parsers is generated as follows:
 \begin{itemize}
     \item \lstinline{Terminal}: it matches, in descending order of priority, any string that resembles a \LaTeX{} command, any special group of characters e.g. \lstinline{|-} and \lstinline{->}, or any single character.
-    \item \lstinline{NonTerminal}: it matches any placeholder across all rules in descending order of length.
+    \item \lstinline{NonTerminal}: it matches any metavariable across all rules in descending order of length.
     \item \lstinline{Multiset}: it matches a sequence of zero or more \lstinline{Terminal}s or \lstinline{NonTerminal}s enclosed within curly braces \lstinline|{}|. The empty multiset definition \lstinline|{}| is technically valid but not very useful: the user can only supply the empty set or a string of commas.
 \end{itemize}
 
@@ -71,12 +70,14 @@ The parser outputs three types of tokens: \lstinline{Terminal}, \lstinline{NonTe
 \label{syntax:factorisation}
 \Cref{parsing:thenor} introduces the idiomatic and non-idiomatic ways of using the \lstinline{then} and \lstinline{or} combinators of \lstinline{parjs} together. The idiomatic approach requires the syntax definition to be left-factored. This section explains the difficulties of left-factoring syntax definitions, and therefore, why the idiomatic approach is not preferred.
 
-The \textit{first set} of a set of alternatives is the set containing every leading token of every alternative and the contributions of each of the leading tokens:
-\begin{itemize}
-    \item If an alternative begins with a \lstinline{Terminal}, the contribution of the \lstinline{Terminal} to the first set is itself.
-    \item If an alternative begins with a \lstinline{NonTerminal}, the contribution of the \lstinline{NonTerminal} to the first set is the first set of the rule corresponding to the \lstinline{NonTerminal}.
-    \item If an alternative begins with a \lstinline{Multiset}, the contribution of the \lstinline{Multiset} to the first set is the union of the singleton \{ \textbackslash varnothing \} and the contribution of the first token of the element definition.
-\end{itemize}
+\begin{definition}[First set]
+    The \textit{first set} of a set of alternatives is the set containing every leading token of every alternative and the contributions of each of the leading tokens:
+    \begin{itemize}
+        \item If an alternative begins with a \lstinline{Terminal}, the contribution of the \lstinline{Terminal} to the first set is itself.
+        \item If an alternative begins with a \lstinline{NonTerminal}, the contribution of the \lstinline{NonTerminal} to the first set is the first set of the rule corresponding to the \lstinline{NonTerminal}.
+        \item If an alternative begins with a \lstinline{Multiset}, the contribution of the \lstinline{Multiset} to the first set is the union of the singleton \{ \textbackslash varnothing \} and the contribution of the first token of the element definition.
+    \end{itemize}
+\end{definition}
 
 For example, consider the following syntax definition:
 \begin{align*}
@@ -91,7 +92,7 @@ The first set of each of the rules is computed as follows:
     \item The first set of the rule corresponding to a statement is the contribution of $\Gamma$, i.e. the set containing \textbackslash varnothing, $x$, $y$, $z$, and the left parenthesis $($.
 \end{itemize}
 
-\subsection{\texorpdfstring{\lstinline{NonTerminal}}{NonTerminal}s sharing non-disjoint first sets with \texorpdfstring{\lstinline{NonTerminal}}{NonTerminal}s and \texorpdfstring{\lstinline{Terminal}}{Terminal}s}
+\subsection{\texorpdfstring{\lstinline{NonTerminal}}{NonTerminal}s sharing non-disjoint first sets with \texorpdfstring{\lstinline{NonTerminal}}{NonTerminal}s and \mbox{\texorpdfstring{\lstinline{Terminal}}{Terminal}s}}
 \label{syntax:factorisation:nonterm}
 Consider the following syntax definition:
 \begin{align*}
@@ -113,7 +114,7 @@ Since there are no more \lstinline{NonTerminal}s left, left-factoring is straigh
 \[
     \text{Statement} \Coloneqq x(x|y) \alt y(zx|y) \alt wzx \alt zx
 \]
-The main disadvantage of this approach is the substitutions destroy information about the \lstinline{NonTerminal}s, which is important for matching names in inference rules. The parser generated from the left-factored definition after substitutions only treats the input as a list of \lstinline{Terminal}s, instead of a \lstinline{NonTerminal} followed by a \lstinline{Terminal}.
+The main disadvantage of this approach is that information about the \lstinline{NonTerminal}s is destroyed by the substitutions. The parser generated from the left-factored definition after substitutions only treats the input as a list of \lstinline{Terminal}s, instead of a \lstinline{NonTerminal} followed by a \lstinline{Terminal}. This complicates the process of matching abstract terms in inference rules.
 
 \subsection{\texorpdfstring{\lstinline{Multiset}}{Multiset}s sharing non-disjoint first sets with \texorpdfstring{\lstinline{NonTerminal}}{NonTerminal}s and \texorpdfstring{\lstinline{Terminal}}{Terminal}s}
 Consider the following syntax definition:
