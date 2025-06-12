@@ -4,7 +4,7 @@ Inference rules define the valid proof steps in a proof system. The application 
 \[
     \Inf[\text{Rule name}]{\text{Premises}}{\text{Conclusion}}
 \]
-which lets us derive the conclusion if all the premises hold. Inference rules can use metavariables to match any user-inputted term. Inference rules can also destructure concrete terms and reject concrete terms that cannot be destructured according to the inference rule. The premises and conclusion of an inference rule are specialised statements that carry structural information and should be parsed more like concrete terms than syntax rules. These specialised statements are called \textit{abstract statements}, consisting of \textit{abstract terms}, which are either metavariables or destructurings of concrete terms.
+which lets us derive the conclusion if all the premises hold. Inference rules can use metavariables to match any concrete term. Inference rules can also destructure concrete terms and reject concrete terms that cannot be destructured according to the inference rule. The premises and conclusion of an inference rule are specialised statements that carry structural information and should be parsed more like concrete terms than syntax rules. These specialised statements are called \textit{abstract statements}, consisting of \textit{abstract terms}, which are either metavariables or destructurings of concrete terms.
 
 Like syntax rules, inference rules may be added, deleted, or replaced by the user. The web application must provide an interface for modifying inference rules, check whether the inference rules are defined sensibly, and be able to verify whether the user has applied an inference rule correctly.
 
@@ -32,7 +32,7 @@ Recall from \Cref{syntax:syntax} that in syntax rule definitions, metavariables 
 \[
     A, B \Coloneqq \varphi \alt (A \to A)
 \]
-Even though $A$ appears twice in different positions of the same alternative, the two concrete terms that take their positions can be different. For example, $(\varphi \to (\varphi \to \varphi))$ is a valid instance of both versions of the syntax rule. However, the abstract term $(A \to A)$ is compatible with a user-inputted term if and only if the two user-inputted sub-terms that take the positions of the two occurrences of $A$ are identical. In this case, $(\varphi \to (\varphi \to \varphi))$ is incompatible with the abstract term $(A \to A)$ because the sub-terms $\varphi$ and $(\varphi \to \varphi)$ are different. The process of matching abstract terms with concrete terms is explained in detail in \Cref{chapter:checking}.
+Even though $A$ appears twice in different positions of the same alternative, the two concrete terms that take their positions can be different. For example, $(\varphi \to (\varphi \to \varphi))$ is a valid instance of both versions of the syntax rule. However, the abstract term $(A \to A)$ is compatible with a concrete term if and only if the two user-inputted sub-terms that take the positions of the two occurrences of $A$ are identical. In this case, $(\varphi \to (\varphi \to \varphi))$ is incompatible with the abstract term $(A \to A)$ because the sub-terms $\varphi$ and $(\varphi \to \varphi)$ are different. The process of matching abstract terms with concrete terms is explained in detail in \Cref{chapter:checking}.
 
 \paragraph{Multisets in inference rules}
 \label{inference:multisets}
@@ -41,7 +41,7 @@ Consider the following syntax rules:
     \Gamma, \Delta &\Coloneqq \{ A \} \\
     A, B &\Coloneqq \varphi \alt (A \to B)
 \end{align*}
-On its own, $\Gamma$ represents a complete multiset. Now, consider the term $\Gamma, A$. $\Gamma$ represents a multiset with one element removed. The removed element is given the name $A$. Since an element can be removed, the user-inputted multiset must contain at least one element: trying to match the user-inputted term $\varnothing$ against the abstract term $\Gamma, A$ results in an error. Note that $\Gamma$ can be empty. Analogously, it is possible to:
+On its own, $\Gamma$ represents a complete multiset. Now, consider the term $\Gamma, A$. $\Gamma$ represents a multiset with one element removed. The removed element is given the name $A$. Since an element can be removed, the user-inputted multiset must contain at least one element: trying to match the concrete term $\varnothing$ against the abstract term $\Gamma, A$ results in an error. Note that $\Gamma$ can be empty. Analogously, it is possible to:
 \begin{itemize}
     \item Match multiple multiset elements, such as $\Gamma, A, B$ and $\Gamma, A, A, A$.
     \item Match multiple multisets, such as $\Gamma, \Delta$.

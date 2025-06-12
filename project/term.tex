@@ -1,13 +1,13 @@
-\section{User terms}
+\section{Concrete terms}
 \label{section:term}
-In this report, a \textit{user-inputted term} refers to an instance or realisation of a syntax rule in the derivation tree. A \textit{user-inputted term} can correspond to a Curry type, a $\lambda$-term, a multiset of propositional formulae, or any syntax rule defined by the user. For example, $((1 \to 2) \to 3)$ is a valid user-inputted term corresponding to the rule $A \Coloneqq 1 \alt 2 \alt 3 \alt (A \to A)$, since it is a valid instance of the rule.
+In this report, a \textit{concrete term} refers to an instance or realisation of a syntax rule in the derivation tree. A \textit{concrete term} can correspond to a Curry type, a $\lambda$-term, a multiset of propositional formulae, or any syntax rule defined by the user. For example, $((1 \to 2) \to 3)$ is a valid concrete term according to the rule $A \Coloneqq 1 \alt 2 \alt 3 \alt (A \to A)$, since it is a valid instance of the rule.
 
-A \textit{user-inputted statement} is a \textit{user-inputted term} corresponding to the syntax rule defining a statement.
+A \textit{concrete statement} is an instance or realisation of the syntax rule defining a statement.
 
-A valid derivation tree consists of valid user-inputted statements and rule names. The application must be able to verify whether each user-inputted statement conforms to the syntax rule defining a statement. This chapter describes the parsing algorithm that achieves this goal.
+A valid derivation tree consists of valid concrete statements and rule names. \projectname{} verifies whether each concrete statement conforms to the syntax rule defining a statement. This chapter describes the parsing algorithm that achieves this goal.
 
-\subsection{Generating term parsers}
-The aim of this step is to generate parsers for parsing terms, given as strings, into a list of abstract syntax trees (ASTs). One parser is generated for every syntax rule. Each parser outputs a list of ASTs. Each AST in the output list corresponds to a token in the parsed definition of the syntax rule.
+\subsection{Parsing concrete terms}
+The aim of this step is to convert a term, given as a string, into a list of abstract syntax trees (ASTs). After parsing a syntax rule into \lstinline{Token}s, we generate a sub-parser for each \lstinline{Token} and combine the sub-parsers sequentially to form an overall parser. Each sub-parser outputs an AST, and the overall parser collects the ASTs from all sub-parsers into a list. The first AST is produced by the sub-parser corresponding to the first \lstinline{Token}, and so on.
 
 \subsubsection{Abstract syntax trees (ASTs)}
 The ASTs are defined as follows:

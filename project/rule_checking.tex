@@ -4,7 +4,7 @@ As the user builds the derivation tree, the application checks whether the infer
 
 An inference rule is compatible with the user input if and only if there is a mapping of names (i.e. metavariables) to ASTs such that replacing all the names in the inference rule with the corresponding ASTs according to the mapping gives the user input. There can be many such mappings for a given inference rule and user input. Since the inference rules are localised, each mapping only applies to one application of an inference rule and need not apply to the rest of the derivation.
 
-\Cref{checking:matching} describes the procedure for obtaining a mapping of names to ASTs given a user-inputted statement and the structure of the corresponding abstract statement. \Cref{checking:verifying} describes how the procedure described in \Cref{checking:matching} is used to check whether all user-inputted premises and the user-inputted conclusion are compatible with the inference rule.
+\Cref{checking:matching} describes the procedure for obtaining a mapping of names to ASTs given a concrete statement and the structure of the corresponding abstract statement. \Cref{checking:verifying} describes how the procedure described in \Cref{checking:matching} is used to check whether all user-inputted premises and the user-inputted conclusion are compatible with the inference rule.
 
 \section{Matching}
 \label{checking:matching}
@@ -21,7 +21,7 @@ The matching algorithm checks whether the mappings deduced from the user input a
 \subsection{Procedure outline}
 \label{matching:procedure}
 \begin{enumerate}
-    \item Parse the user-inputted statement into a list of ASTs.
+    \item Parse the concrete statement into a list of ASTs.
     \item Check the list of ASTs has the same length as the list of \lstinline{Matchable} tokens in the abstract statement.
     \item Pair up each AST with the corresponding \lstinline{Matchable} token and recursively match each pair.
     \item Repeat step 3 until no new names are added to \lstinline{names}.

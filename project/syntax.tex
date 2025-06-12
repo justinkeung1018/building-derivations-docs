@@ -15,7 +15,7 @@ A syntax rule consists of:
 \end{itemize}
 In rule definitions, curly braces \lstinline|{}| represent a multiset. The structure of each element of a multiset is defined by the content enclosed within the curly braces. For example, the definition \lstinline|{ M: A }| represents a possibly empty collection of possibly duplicate elements following the structure \lstinline{M: A}.
 
-Every valid syntax definition (i.e. collection of syntax rules) must contain at least one rule for a statement. A valid syntax definition can contain multiple rules for a statement. All non-statement rules must specify metavariables. Otherwise, there is no way to refer to the definition of such rules and they might as well be removed from the syntax definition.
+Every valid syntax definition (i.e. collection of syntax rules) must contain at least one rule for a statement. All non-statement rules must specify metavariables. Otherwise, there is no way to refer to the definition of such rules and they might as well be removed from the syntax definition. Every syntax rule, including the rule defining a statement, can contain one or more non-empty alternatives.
 
 The only special character in the definition of metavariables is the comma. The special characters in the definition of a syntax rule are the vertical bar \lstinline{|} and the curly braces \lstinline|{}|. Unlike in extended Backus-Naur form, characters like parentheses \lstinline{()} and brackets \lstinline{[]} do not carry any special meaning anywhere in this system and are no different from any other ordinary character. Certain groups of characters, such as \lstinline{|-} and \lstinline{->}, are treated as one symbol and shorthands for \LaTeX{} commands, such as \lstinline{\vdash} and \lstinline{\rightarrow}.
 
