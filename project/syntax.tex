@@ -56,6 +56,7 @@ The process consists of three steps: splitting the metavariables and alternative
 When the backend receives user input from the frontend, every rule is specified by a string representing the metavariables and a string representing the definition. The metavariable string is split on commas to give a list of metavariables. To preprocess the definition string, all occurrences of \lstinline{|-} are replaced with \lstinline{\vdash}, the \LaTeX{} command for a turnstile, then the string is split on vertical bars \lstinline{|} to give a list of alternatives. The replacement is necessary and correct as \lstinline{|-} contains a vertical bar \lstinline{|} while \lstinline{\vdash} does not.
 
 \subsubsection{Normalise metavariables and rule definitions}
+\label{syntax:normalise}
 Aliases of a symbol are unified. For example, the symbol for an arrow \lstinline{->} can be represented by \lstinline{\rightarrow}, \lstinline{\to}, \lstinline{->}, and the Unicode character →. In this case, all aliases are replaced with \lstinline{->} (other than having the fewest characters and better readability, the choice is entirely arbitrary). Prior to the replacements, a space is added after all substrings that resemble a \LaTeX{} command, i.e. any substring beginning with \lstinline{\} and a string of non-whitespace characters. This ensures we do not accidentally replace parts of a \LaTeX{} command and e.g. turn \lstinline{\toI} into \lstinline{->I}. The user may have intended the latter, but the former is a typo nonetheless.
 
 \subsubsection{Generate parser}

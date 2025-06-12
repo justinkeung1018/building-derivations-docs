@@ -9,7 +9,7 @@ The correctness of the parsing, matching, and verification algorithms are verifi
 
 There is a high degree of confidence in the matching and verification algorithms, since they are based on custom data structures independent of the user input. To identify further edge cases in the parsing algorithm and determine how well the parsing algorithm adapts to a wide range of user inputs, the parsing algorithm is tested against extensions of the pre-defined systems and brand new proof systems.
 
-\subsection{Lambda calculus with pairs}
+\subsection{$\lambda$-calculus with pairs}
 \label{evaluation:lambda-pairs}
 The syntaxes of $\lambda$-terms and Curry types are extended with the following constructors \cite{van-bakel:2022}:
 \begin{align*}
@@ -33,45 +33,87 @@ A correct derivation using all three newly added constructors and type assignmen
 \end{figure}
 
 \subsection{\texorpdfstring{\lbm{}}{Lambda bar mu}}
-The calculus \lbm{} as presented by Curien and Herbelin \cite{curien-herbelin:2000} defines three types of terms \cite{van-bakel:2024}:
-\begin{align*}
-    c &\Coloneqq \langle t | e \rangle &(\textit{commands}) \\
-    t &\Coloneqq x \alt (\lambda x. t) \alt (\mu \beta. c) &(\textit{terms}) \\
-    e &\Coloneqq \alpha \alt (t \cdot e) \alt (\tilde{\mu}x. c) &(\textit{environments})
-\end{align*}
-where $x$ can be any symbol from an infinite list of term variables $a, b, c, \ldots, x, y, z \ldots$. \todo{What are $\alpha$ and $\beta$?} \lbm{} defines three kinds of statements, each typing a different syntactic category:
-\begin{align*}
-    \text{Statement} \Coloneqq{} &c: \Gamma \vdash \Delta &(\textit{commands}) \\
-    |\  &\Gamma \vdash t: A \alt \Delta &(\textit{terms}) \\
-    |\  &\Gamma \alt e: A \vdash \Delta &(\textit{environments})
-\end{align*}
-where $A$ represents a Curry type, while $\Gamma$ and $\Delta$ represent a set of variable type assignments. The type assignment rules are defined as follows:
-\[
-    (\textit{cut}): \frac{\Gamma \vdash t: A \alt \Delta \quad \Gamma \alt e: A \vdash \Delta}{\langle t|e \rangle: \Gamma \vdash \Delta}
-\]
-\vspace{-24pt}
-\begin{center}
-    \begin{minipage}{.4\textwidth}
-        \begingroup
-        \addtolength{\jot}{1em}
-        \begin{align*}
-            (Ax_R)&: \frac{}{\Gamma, x: A \vdash x: A \alt \Delta} \\
-            (\arr R)&: \frac{\Gamma, x: A \vdash t: B \alt \Delta}{\Gamma \vdash (\lambda x. t): (A \to B) \alt \Delta} \\
-            (\mu)&: \frac{c: \Gamma \vdash \alpha: A, \Delta}{\Gamma \vdash (\mu \alpha. c): A \alt \Delta}
-        \end{align*}
-        \endgroup
-    \end{minipage}%
-    \begin{minipage}{.4\textwidth}
-        \begingroup
-        \addtolength{\jot}{1em}
-        \begin{align*}
-            (Ax_L)&: \frac{}{\Gamma \alt \alpha: A \vdash \alpha: A, \Delta} \\
-            (\arr L)&: \frac{\Gamma \vdash t: A \alt \Delta \quad \Gamma \alt e: B \vdash \Delta}{\Gamma \alt (t \cdot e): (A \to B) \vdash \Delta} \\
-            (\tilde{\mu})&: \frac{c: \Gamma, x: A \vdash \Delta}{\Gamma \alt (\tilde{\mu}x. c): A \vdash \Delta}
-        \end{align*}
-        \endgroup
-    \end{minipage}
-\end{center}
+The calculus \lbm{} was first presented by Curien and Herbelin in 2000 \cite{curien-herbelin:2000}.
+\begin{definition}[Syntactic categories in \lbm{}]
+    \lbm{} defines three syntactic categories:
+    \begin{align*}
+        c &\Coloneqq \langle t | e \rangle &(\textit{commands}) \\
+        t &\Coloneqq x \alt (\lambda x. t) \alt (\mu \beta. c) &(\textit{terms}) \\
+        e &\Coloneqq \alpha \alt (t \cdot e) \alt (\tilde{\mu}x. c) &(\textit{environments})
+    \end{align*}
+    where $x$ can be any symbol from an infinite list $x, y, z, \ldots$ of \textit{term variables}, and $\alpha$ and $\beta$ can be any symbol from an infinite list $\alpha, \beta, \gamma, \ldots$ of \textit{environment variables} \cite{van-bakel:2024}.
+\end{definition}
+\begin{definition}[Judgements in \lbm{}]
+    \lbm{} defines three types of \textit{judgements} (or \textit{statements}), each typing a syntactic category:
+    \begin{align*}
+        \text{Judgement} \Coloneqq{} &c: \Gamma \vdash \Delta &(\textit{commands}) \\
+        |\  &\Gamma \vdash t: A \alt \Delta &(\textit{terms}) \\
+        |\  &\Gamma \alt e: A \vdash \Delta &(\textit{environments})
+    \end{align*}
+    where $A$ represents a Curry type, $\Gamma$ represents a set of assignments from variables to types, and $\Delta$ represents a set of assignments from co-variables to types.
+\end{definition}
+\begin{definition}[Type assignment rules in \lbm{}]
+    The type assignment rules are defined as follows:
+    {
+        \derivationfont
+        \[
+            (\textsf{Cut}): \frac{\Gamma \vdash t: A \alt \Delta \quad \Gamma \alt e: A \vdash \Delta}{\langle t|e \rangle: \Gamma \vdash \Delta}
+        \]
+    }%
+    \vspace{-26pt}
+    \begin{center}
+        \derivationfont
+        \begin{minipage}{.4\textwidth}
+            \begingroup
+            \addtolength{\jot}{1em}
+            \begin{align*}
+                (Ax_R)&: \frac{}{\Gamma, x: A \vdash x: A \alt \Delta} \\
+                (\arr R)&: \frac{\Gamma, x: A \vdash t: B \alt \Delta}{\Gamma \vdash (\lambda x. t): (A \to B) \alt \Delta} \\
+                (\mu)&: \frac{c: \Gamma \vdash \alpha: A, \Delta}{\Gamma \vdash (\mu \alpha. c): A \alt \Delta}
+            \end{align*}
+            \endgroup
+        \end{minipage}%
+        \begin{minipage}{.4\textwidth}
+            \begingroup
+            \addtolength{\jot}{1em}
+            \begin{align*}
+                (Ax_L)&: \frac{}{\Gamma \alt \alpha: A \vdash \alpha: A, \Delta} \\
+                (\arr L)&: \frac{\Gamma \vdash t: A \alt \Delta \quad \Gamma \alt e: B \vdash \Delta}{\Gamma \alt (t \cdot e): (A \to B) \vdash \Delta} \\
+                (\tilde{\mu})&: \frac{c: \Gamma, x: A \vdash \Delta}{\Gamma \alt (\tilde{\mu}x. c): A \vdash \Delta}
+            \end{align*}
+            \endgroup
+        \end{minipage}
+    \end{center}
+\end{definition}
+Since vertical bars | in syntax definitions are used to separate alternatives, the vertical bars in the judgements and commands are input using the \LaTeX{} command ``\lstinline{\vert}'' instead. This is not an elegant solution, since ``\lstinline{\vert}'' and the character ``|'' are synonyms of each other, yet they are treated differently and not unified (see \Cref{syntax:normalise} on normalising symbol aliases).
+
+An alternative solution is to not use the character ``|'' to separate alternatives and offer separate input fields in the user interface for each alternative. Although this makes \projectname{} treat both synonyms equally, the additional input fields may bloat the user interface.
+
+\Cref{fig:evaluation:lambda-bar-mu-definition} shows the definitions of the syntax and inference rules in \projectname{}. \Cref{fig:evaluation:lambda-bar-mu-derivations} shows several derivations in \lbm{} in \projectname{}.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth]{evaluation/lambda-bar-mu-definition.png}
+    \caption{Definition of syntax and inference rules of \lbm{} in \projectname{}}
+    \label{fig:evaluation:lambda-bar-mu-definition}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{evaluation/lambda-bar-mu-derivation-mu.png}
+        \caption{Derivation using the rule ($\mu$)}
+    \end{subfigure}%
+    \bigskip\hrulefill\bigskip
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{evaluation/lambda-bar-mu-derivation-tilde-mu.png}
+        \caption{Derivation using the rule ($\tilde{\mu}$)}
+    \end{subfigure}
+    \caption{Derivations in \lbm{} in \projectname{}}
+    \label{fig:evaluation:lambda-bar-mu-derivations}
+\end{figure}
 
 \section{User experience}
 \label{evaluation:ux}
@@ -102,7 +144,7 @@ This particular conclusion is chosen because it is fairly simple and its derivat
 
 The goal of this task is to evaluate the intuitiveness of the syntax and inference rule editors. In particular, the evaluation focuses on how the users interact with the user interface to check the correctness of their definitions and the usefulness of the error messages and warnings.
 
-\subsubsection{Sequent calculus \textsc{lk}}
+\subsubsection{Sequent Calculus \textsc{lk}}
 In this task, the user is asked to derive the following conclusion in the system \textsc{lk}:
 \[
     ((x \lor y) \to z) \vdash (x \to z)
