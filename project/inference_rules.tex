@@ -2,11 +2,11 @@
 \label{section:inference}
 Inference rules define the valid proof steps in a proof system. The application supports inference rules of the form
 \[
-    \Inf[\text{Rule name}]{\text{Premises}}{\text{Conclusion}}
+    \Inf[\text{Rule name}]{\text{Zero or more premises}}{\text{Conclusion}}
 \]
 which lets us derive the conclusion if all the premises hold. Inference rules can use metavariables to match any concrete term. Inference rules can also destructure concrete terms and reject concrete terms that cannot be destructured according to the inference rule. The premises and conclusion of an inference rule are specialised statements that carry structural information and should be parsed more like concrete terms than syntax rules. These specialised statements are called \textit{abstract statements}, consisting of \textit{abstract terms}, which are either metavariables or destructurings of concrete terms.
 
-Like syntax rules, inference rules may be added, deleted, or replaced by the user. The web application must provide an interface for modifying inference rules, check whether the inference rules are defined sensibly, and be able to verify whether the user has applied an inference rule correctly.
+Like syntax rules, inference rules may be added, deleted, or replaced by the user. \projectname{} provides an interface for modifying inference rules, checks whether the inference rules are defined sensibly, and verifies whether the user has applied an inference rule correctly.
 
 \Cref{inference:syntax} defines the syntax in which a user expresses an inference rule in the application, describes the concept of \textit{abstract terms}, and contrasts it with \textit{concrete terms} introduced in the previous chapter. \Cref{inference:parsing} describes the procedure for transforming an arbitrary set of inference rules into intermediate internal representations, in preparation for verifying applications of the inference rules in the derivation tree.
 
@@ -18,14 +18,19 @@ An inference rule consists of:
     \item One \textbf{conclusion} following the structure of a statement, and
     \item Zero or more \textbf{premises}, each following the structure of a statement
 \end{itemize}
-Inference rules are \textit{local}: checking whether an inference rule is applied correctly only requires information immediately above and below the step of applying the inference rule, but not any information further up or down the derivation tree.
+\projectname{} only supports \textit{localised} inference rules: checking whether an inference rule is applied correctly only requires information immediately above and below the step of applying the inference rule, but not any information further up or down the derivation tree.
 
-\subsubsection{Terminology: abstract terms and statements}
-In this report, an \textit{abstract statement} refers to one of the premises or the conclusion of an inference rule. A term appearing in an abstract statement may not always be a valid term when given by the user. Consider the following syntax rule:
+\subsubsection{Abstract terms and statements}
+In this report, an \textit{abstract statement} refers to one of the premises or the conclusion of an inference rule. Abstract statements can contain metavariables, while concrete statements cannot. Consider the following syntax rule:
 \[
     A, B \Coloneqq \varphi \alt (A \to B)
 \]
-In a derivation, the user can only input terms like $\varphi$, $(\varphi \to \varphi)$, and $((\varphi \to \varphi) \to \varphi)$. In an inference rule, however, an instance of a syntax rule can be represented by any of its metavariables and partially expanded versions of its definition. In this case, $A$, $B$, $(A \to B)$, $((A \to B) \to A)$, and even $((B \to \varphi) \to B)$ are all valid \textit{abstract terms}. In this report, a \textit{(user-inputted) term} refers to an instance of a syntax rule that appears in derivations and an \textit{abstract term} refers to an instance of a syntax rule that appears in an abstract statement. All valid user-inputted are valid abstract terms, and so the set of abstract terms for any syntax definition with more than one non-statement rule is a strict superset of the set of user-inputted \textit{terms}\footnote{A syntax definition with only rules for statements does not have any metavariables, so the rule definitions cannot refer to any metavariables and must only consist of terminals and multisets. For such a syntax definition, the set of abstract terms is equal to the set of terms.}.
+In a derivation, the user can only input concrete terms like $\varphi$, $(\varphi \to \varphi)$, and $((\varphi \to \varphi) \to \varphi)$. In an inference rule, however, the user can input abstract terms like $A$, $B$, $(A \to B)$, $((A \to B) \to A)$, and even $((B \to \varphi) \to B)$. An abstract term is either a metavariable of the corresponding rule, or partially expanded versions of its definition. For the syntax rule above, the following grammar specifies the set of abstract terms:
+\[
+    \varphi \alt (A \to B) \alt \text{``$A$''} \alt \text{``$B$''}
+\]
+
+All valid concrete terms are valid abstract terms.
 
 \paragraph{Metavariables in syntax rule definitions vs. abstract statements}
 Recall from \Cref{syntax:syntax} that in syntax rule definitions, metavariables for a rule can be used interchangeably. The following syntax rule is semantically identical to the example above:
@@ -41,7 +46,7 @@ Consider the following syntax rules:
     \Gamma, \Delta &\Coloneqq \{ A \} \\
     A, B &\Coloneqq \varphi \alt (A \to B)
 \end{align*}
-On its own, $\Gamma$ represents a complete multiset. Now, consider the term $\Gamma, A$. $\Gamma$ represents a multiset with one element removed. The removed element is given the name $A$. Since an element can be removed, the user-inputted multiset must contain at least one element: trying to match the concrete term $\varnothing$ against the abstract term $\Gamma, A$ results in an error. Note that $\Gamma$ can be empty. Analogously, it is possible to:
+On its own, $\Gamma$ represents a complete multiset. Now, consider the term $\Gamma, A$. In this term, $\Gamma$ represents a multiset with one element removed. The removed element is given the name $A$. Since an element can be removed, the user-inputted multiset must contain at least one element: trying to match the concrete term $\varnothing$ against the abstract term $\Gamma, A$ results in an error. Note that $\Gamma$ can be empty. Analogously, it is possible to:
 \begin{itemize}
     \item Match multiple multiset elements, such as $\Gamma, A, B$ and $\Gamma, A, A, A$.
     \item Match multiple multisets, such as $\Gamma, \Delta$.
@@ -78,7 +83,8 @@ The aim of this step is to generate parsers for parsing an abstract statement in
     Match the string stored in the \lstinline{value} field.
     \item \begin{lstlisting}[style=ds]
         class Name {
-            constructor(readonly index: number, readonly name: string) {} }
+            constructor(readonly index: number, readonly name: string) {}
+        }
     \end{lstlisting}
     Assign exactly one AST to \lstinline{name} and ensure this assignment is compatible with all other occurrences of the same \lstinline{name} in other statements of the same inference rule. The AST must represent an instance of the syntax rule at \lstinline{index}\footnote{The \lstinline{index} field can be deduced from the \lstinline{name} field since the metavariables are unique across all syntax rules. The \lstinline{index} field exists merely to simplify bookkeeping.}.
     \item \begin{lstlisting}[style=ds]
