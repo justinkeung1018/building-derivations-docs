@@ -1,5 +1,5 @@
-\chapter{Inference rules}
-\label{chapter:inference}
+\section{Inference rules}
+\label{section:inference}
 Inference rules define the valid proof steps in a proof system. The application supports inference rules of the form
 \[
     \Inf[\text{Rule name}]{\text{Premises}}{\text{Conclusion}}
@@ -8,9 +8,9 @@ which lets us derive the conclusion if all the premises hold. Inference rules ca
 
 Like syntax rules, inference rules may be added, deleted, or replaced by the user. The web application must provide an interface for modifying inference rules, check whether the inference rules are defined sensibly, and be able to verify whether the user has applied an inference rule correctly.
 
-\Cref{inference:syntax} defines the syntax in which a user expresses an inference rule in the application, describes the concept of \textit{inference rule terms}, and contrasts it with \textit{user-inputted terms} introduced in the previous chapter. \Cref{inference:ui} gives an overview of the parts of the user interface for modifying inference rules. \Cref{inference:parsing} describes the procedure for transforming an arbitrary set of inference rules into intermediate internal representations, in preparation for verifying applications of the inference rules in the derivation tree.
+\Cref{inference:syntax} defines the syntax in which a user expresses an inference rule in the application, describes the concept of \textit{inference rule terms}, and contrasts it with \textit{user-inputted terms} introduced in the previous chapter. \Cref{inference:parsing} describes the procedure for transforming an arbitrary set of inference rules into intermediate internal representations, in preparation for verifying applications of the inference rules in the derivation tree.
 
-\section{Syntax of inference rules}
+\subsection{Syntax of inference rules}
 \label{inference:syntax}
 An inference rule consists of:
 \begin{itemize}
@@ -20,21 +20,21 @@ An inference rule consists of:
 \end{itemize}
 Inference rules are \textit{local}: checking whether an inference rule is applied correctly only requires information immediately above and below the step of applying the inference rule, but not any information further up or down the derivation tree.
 
-\subsection{Terminology: inference rule terms and statements}
+\subsubsection{Terminology: inference rule terms and statements}
 In this report, an \textit{inference rule statement} refers to one of the premises or the conclusion of an inference rule. A term appearing in an inference rule statement may not always be a valid term when given by the user. Consider the following syntax rule:
 \[
     A, B \Coloneqq \varphi \alt (A \to B)
 \]
 In a derivation, the user can only input terms like $\varphi$, $(\varphi \to \varphi)$, and $((\varphi \to \varphi) \to \varphi)$. In an inference rule, however, an instance of a syntax rule can be represented by any of its placeholders and partially expanded versions of its definition. In this case, $A$, $B$, $(A \to B)$, $((A \to B) \to A)$, and even $((B \to \varphi) \to B)$ are all valid \textit{inference rule terms}. In this report, a \textit{(user-inputted) term} refers to an instance of a syntax rule that appears in derivations and an \textit{inference rule term} refers to an instance of a syntax rule that appears in an inference rule statement. All valid user-inputted are valid inference rule terms, and so the set of inference rule terms for any syntax definition with more than one non-statement rule is a strict superset of the set of user-inputted \textit{terms}\footnote{A syntax definition with only rules for statements does not have any placeholders, so the rule definitions cannot refer to any placeholders and must only consist of terminals and multisets. For such a syntax definition, the set of inference rule terms is equal to the set of terms.}.
 
-\subsubsection{Placeholders in syntax rule definitions vs. inference rule statements}
+\paragraph{Placeholders in syntax rule definitions vs. inference rule statements}
 Recall from \Cref{syntax:syntax} that in syntax rule definitions, placeholders for a rule can be used interchangeably. The following syntax rule is semantically identical to the example above:
 \[
     A, B \Coloneqq \varphi \alt (A \to A)
 \]
 Even though $A$ appears twice in different positions of the same alternative, the two user-inputted terms that take their positions can be different. For example, $(\varphi \to (\varphi \to \varphi))$ is a valid instance of both versions of the syntax rule. However, the inference rule term $(A \to A)$ is compatible with a user-inputted term if and only if the two user-inputted sub-terms that take the positions of the two occurrences of $A$ are identical. In this case, $(\varphi \to (\varphi \to \varphi))$ is incompatible with the inference rule term $(A \to A)$ because the sub-terms $\varphi$ and $(\varphi \to \varphi)$ are different. The process of matching inference rule terms with user-inputted terms is explained in detail in \Cref{chapter:checking}.
 
-\subsubsection{Multisets in inference rules}
+\paragraph{Multisets in inference rules}
 \label{inference:multisets}
 Consider the following syntax rules:
 \begin{align*}
@@ -64,14 +64,12 @@ Note that a placeholder (in this case, $\Gamma$ or $\Delta$) can represent a mul
     \Gamma, \Delta \Coloneqq \{ A \}: B
 \]
 instead, things like $\Gamma, A$ and $\Gamma, \Delta, A$ are not valid inference rule terms for the modified syntax rule.
-\section{User interface}
-\label{inference:ui}
 
-\section{Parsing inference rules}
+\subsection{Parsing inference rules}
 \label{inference:parsing}
 The aim of this step is to generate parsers for parsing an inference rule statement into a list of \lstinline{Matchable} tokens.
 
-\subsection{\texorpdfstring{\lstinline{Matchable}}{Matchable} tokens}
+\subsubsection{\texorpdfstring{\lstinline{Matchable}}{Matchable} tokens}
 \lstinline{Matchable} tokens are to inference rules like ASTs are to terms and \lstinline{Token}s are to syntax rules. \lstinline{Matchable} tokens represent the structure of an inference rule statement. They are defined as follows:
 \begin{lstlisting}
     class MatchableTerminal { constructor(readonly value: string) {} }
@@ -99,7 +97,7 @@ The semantics of the \lstinline{Matchable} tokens are as follows:
     \item \lstinline{MatchableNonTerminal}: match an inference rule term corresponding to the syntax rule at \lstinline{index}. The structure of the inference rule term is given by the \lstinline{children} field.
     \item \lstinline{MatchableMultiset}: match a multiset of elements given by the \lstinline{elements} field. A member of \lstinline{elements} can either be a \lstinline{Name} or a \lstinline{MultisetElement}. A \lstinline{Name} refers to a multiset (e.g. $\Gamma$ and $\Delta$ in the example in the previous section) while a \lstinline{MultisetElement} refers to a multiset element that must be matched from the user-inputted multiset term (e.g. $A$ and $(A \to B)$ in the previous section). The \lstinline{elements} field is represented as an (ordered) array instead of an unordered set purely for simpler bookkeeping in the matching algorithm.
 \end{itemize}
-\subsection{Procedure}
+\subsubsection{Procedure}
 Parsing inference rule statements is extremely similar to parsing terms, as an inference rule statement can be thought of as an instance of a statement in a different context. As with generating term parsers, a delayed parser is created  for every syntax rule using the \lstinline{later} combinator. Each of these delayed parsers is instantiated by iterating over the tokens in every alternative of the syntax rule and examining the type of the token:
 \begin{itemize}
     \item \lstinline{Terminal}: parse the string verbatim and wrap the result in a \lstinline{MatchableTerminal} token.

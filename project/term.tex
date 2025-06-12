@@ -1,15 +1,15 @@
-\chapter{User-inputted terms}
-\label{chapter:term}
+\section{User terms}
+\label{section:term}
 In this report, a \textit{user-inputted term} refers to an instance or realisation of a syntax rule in the derivation tree. A \textit{user-inputted term} can correspond to a Curry type, a $\lambda$-term, a multiset of propositional formulae, or any syntax rule defined by the user. For example, $((1 \to 2) \to 3)$ is a valid user-inputted term corresponding to the rule $A \Coloneqq 1 \alt 2 \alt 3 \alt (A \to A)$, since it is a valid instance of the rule.
 
 A \textit{user-inputted statement} is a \textit{user-inputted term} corresponding to the syntax rule defining a statement.
 
 A valid derivation tree consists of valid user-inputted statements and rule names. The application must be able to verify whether each user-inputted statement conforms to the syntax rule defining a statement. This chapter describes the parsing algorithm that achieves this goal.
 
-\section{Generating term parsers}
+\subsection{Generating term parsers}
 The aim of this step is to generate parsers for parsing terms, given as strings, into a list of abstract syntax trees (ASTs). One parser is generated for every syntax rule. Each parser outputs a list of ASTs. Each AST in the output list corresponds to a token in the parsed definition of the syntax rule.
 
-\subsection{Abstract syntax trees (ASTs)}
+\subsubsection{Abstract syntax trees (ASTs)}
 The ASTs are defined as follows:
 \begin{lstlisting}
     class TerminalAST { constructor(readonly value: string) {} }
@@ -22,7 +22,7 @@ The ASTs are defined as follows:
     type AST = TerminalAST | NonTerminalAST | MultisetAST;
 \end{lstlisting}
 
-\subsection{Procedure}
+\subsubsection{Procedure}
 \label{term:procedure}
 A list of \textit{delayed parsers} is generated using the \lstinline{later} combinator. A \textit{delayed parser}\footnote{In \lstinline{parjs}, a delayed parser has type \lstinline{DelayedParjser<T>}.} is a parser that does not carry any logic and must be initialised before being used for parsing \cite{parjs}. A delayed parser can be chained and combined with other parsers like a normal parser. There are two main benefits of generating delayed parsers and later initialising them:
 \begin{itemize}
