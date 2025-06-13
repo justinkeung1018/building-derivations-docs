@@ -160,9 +160,33 @@ Consider the following syntax definition:
     A &\Coloneqq x \alt y \\
     B &\Coloneqq x \alt z
 \end{align*}
+Similar to the previous case, humans can distinguish between an element in $\Gamma$ and an element in $\Delta$ based on the second character of the element. If the second character is $x$, then the element belongs to $\Gamma$. Otherwise, the element belongs to $\Delta$.
 
-\subsection{Limitations}
-\subsubsection{Metavariables cannot be used as terminals}
+However, if a parser parses the statement $xx \vdash x$ from left to right and first sees the character $x$, it cannot determine whether it is about to parse an element in $\Gamma$ or an element in $\Delta$. Like in the previous case, the parser must keep track of this ambiguity until it can be resolved, which can be arbitrarily late in the input in general.
+
+The solution, once again, is to substitute and expand the offending multiset definitions. The rule for $\Gamma$ becomes
+\begin{align*}
+    \Gamma \Coloneqq \ &\varnothing  \\
+    \alt &xx \ [\text{optionally followed by 0 or more repetitions of },xx] \\
+    \alt &yx \ [\text{optionally followed by 0 or more repetitions of },yx]
+\end{align*}
+and the rule for $\Delta$ becomes
+\begin{align*}
+    \Gamma \Coloneqq \ &\varnothing  \\
+    \alt &xy \ [\text{optionally followed by 0 or more repetitions of },xy] \\
+    \alt &zy \ [\text{optionally followed by 0 or more repetitions of },zy]
+\end{align*}
+The final syntax definition becomes
+\begin{align*}
+    \text{Statement} \Coloneqq \ &\Sigma \vdash (x|y) \\
+    \Sigma \Coloneqq \ &\varnothing \\
+    \alt &x (x \ [\text{optionally 0 or more },xx] \alt y \ [\text{optionally 0 or more},xy]) \\
+    \alt &yx \ [\text{optionally 0 or more },yx] \\
+    \alt &zy \ [\text{optionally 0 or more },zy]
+\end{align*}
+which destroys the structure of $\Gamma$ and $\Delta$ in the original syntax definition.
+
+\subsection{Limitation: metavariables cannot be used as terminals}
 Suppose a user tries to define the syntax of $\lambda$-terms:
 \begin{align*}
     M, N &\Coloneqq x \alt (\lambda x. M) \alt (MN) \\
@@ -177,3 +201,4 @@ The use of $var$ is unconventional and differs from most textbook formulations. 
 \[
   a, b \Coloneqq \varphi \alt (a \to b)
 \]
+Since the $a$ and $b$ in the second alternative are treated as strings instead of metavariables, this definition is actually not self-recursive.
