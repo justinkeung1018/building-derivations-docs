@@ -15,11 +15,11 @@ A syntax rule consists of:
 \end{itemize}
 In rule definitions, curly braces \lstinline|{}| represent a multiset. The structure of each element of a multiset is defined by the content enclosed within the curly braces. For example, the definition \lstinline|{ M: A }| represents a possibly empty collection of possibly duplicate elements following the structure \lstinline{M: A}.
 
-Every valid syntax definition (i.e. collection of syntax rules) must contain at least one rule for a statement. All non-statement rules must specify metavariables. Otherwise, there is no way to refer to the definition of such rules and they might as well be removed from the syntax definition. Every syntax rule, including the rule defining a statement, can contain one or more non-empty alternatives.
+Every valid syntax definition (i.e. collection of syntax rules) must contain at least one rule, which defines a statement. All non-statement rules must specify metavariables. Otherwise, there is no way to refer to the definition of such rules and they might as well be removed from the syntax definition. Every syntax rule, including the rule defining a statement, can contain one or more non-empty alternatives.
 
 The only special character in the definition of metavariables is the comma. The special characters in the definition of a syntax rule are the vertical bar \lstinline{|} and the curly braces \lstinline|{}|. Unlike in extended Backus-Naur form, characters like parentheses \lstinline{()} and brackets \lstinline{[]} do not carry any special meaning anywhere in this system and are no different from any other ordinary character. Certain groups of characters, such as \lstinline{|-} and \lstinline{->}, are treated as one symbol and shorthands for \LaTeX{} commands, such as \lstinline{\vdash} and \lstinline{\rightarrow}.
 
-A rule definition can refer to itself or other rules by their metavariables. In the definition of syntax rules, there is no difference using one metavariable over another to refer to the same rule. For example, given the metavariables \lstinline{A} and \lstinline{B} for a rule, the definitions \lstinline{(A -> A)}, \lstinline{(B -> B)}, \lstinline{(A -> B)}, and \lstinline{(B -> A)} are all identical. However, it is useful to have multiple metavariables because in inference rules, metavariables are treated as names representing concrete objects.
+A rule definition can refer to itself or other rules by their metavariables. In the definition of syntax rules, there is no difference using one metavariable over another to refer to the same rule. For example, given the metavariables \lstinline{A} and \lstinline{B} for a rule, the definitions \lstinline{(A -> A)}, \lstinline{(B -> B)}, \lstinline{(A -> B)}, and \lstinline{(B -> A)} are all identical. However, it is useful to have multiple metavariables because in inference rules, metavariables are treated as names representing concrete term: the same metavariable must refer to the same concrete term.
 
 \subsection{Parsing syntax rules}
 \label{syntax:parsing}
@@ -35,7 +35,7 @@ The tokens are defined as follows:
     \item \begin{lstlisting}[style=ds]
         class NonTerminal { constructor(readonly index: number) {} }
     \end{lstlisting}
-    The \lstinline{index} field of \lstinline{NonTerminal} is the position of the rule referenced by the \lstinline{NonTerminal} in the ordered list of syntax rules. For example, if a syntax definition contains two rules
+    The \lstinline{index} field of a \lstinline{NonTerminal} is the position of the rule referenced by the \lstinline{NonTerminal} in the ordered list of syntax rules. For example, if a syntax definition contains two rules
     \begin{align*}
         S &\Coloneqq \ldots \\
         A, B &\Coloneqq \ldots
@@ -44,7 +44,7 @@ The tokens are defined as follows:
     \item \begin{lstlisting}[style=ds]
         class Multiset { constructor(readonly tokens: Token[]) {} }
     \end{lstlisting}
-    The \lstinline{tokens} field of \lstinline{Multiset} defines the structure of an element of the multiset. For example, consider a rule definition that contains a multiset:
+    The \lstinline{tokens} field of a \lstinline{Multiset} defines the structure of an element of the multiset. For example, consider a rule definition that contains a multiset:
     \begin{align*}
         S &\Coloneqq \{ var: A \}
     \end{align*}
@@ -56,14 +56,14 @@ Finally, the \lstinline{Token} type is defined as
 \end{center}
 
 \subsubsection{Procedure}
-The process consists of three steps: splitting the metavariables and alternatives of the rule definitions, normalising them, and generating a parser for a rule alternative.
+The process consists of three steps: splitting the metavariables and alternatives of the rule definitions, normalising them, and generating a parser for any alternative of a definition.
 
 \paragraph{Splitting metavariables and alternatives of rule definitions}
-When the backend receives user input from the frontend, every rule is specified by a string representing the metavariables and a string representing the definition. The metavariable string is split on commas to give a list of metavariables. To preprocess the definition string, all occurrences of \lstinline{|-} are replaced with \lstinline{\vdash}, the \LaTeX{} command for a turnstile, then the string is split on vertical bars \lstinline{|} to give a list of alternatives. The replacement is necessary and correct as \lstinline{|-} contains a vertical bar \lstinline{|} while \lstinline{\vdash} does not.
+When the backend receives user input from the frontend, every rule is specified by a string representing the metavariables and a string representing the definition, e.g. ``\lstinline{A, B, C}''. The metavariable string is split on commas to give a list of metavariables. To preprocess the definition string, all occurrences of \lstinline{|-} are replaced with \lstinline{\vdash}, the \LaTeX{} command for a turnstile, then the string is split on vertical bars \lstinline{|} to give a list of alternatives. The replacement is necessary and correct as \lstinline{|-} contains a vertical bar \lstinline{|} while \lstinline{\vdash} does not.
 
 \paragraph{Normalise metavariables and rule definitions}
 \label{syntax:normalise}
-Aliases of a symbol are unified. For example, the symbol for an arrow \lstinline{->} can be represented by \lstinline{\rightarrow}, \lstinline{\to}, \lstinline{->}, and the Unicode character →. In this case, all aliases are replaced with \lstinline{->} (other than having the fewest characters and better readability, the choice is entirely arbitrary). Prior to the replacements, a space is added after all substrings that resemble a \LaTeX{} command, i.e. any substring beginning with \lstinline{\} and a string of non-whitespace characters. This ensures we do not accidentally replace parts of a \LaTeX{} command and e.g. turn \lstinline{\toI} into \lstinline{->I}. The user may have intended the latter, but the former is a typo nonetheless.
+Aliases of a symbol are unified. For example, the symbol for an arrow \lstinline{->} can be represented by \lstinline{\rightarrow}, \lstinline{\to}, \lstinline{->}, and the Unicode character →. In this case, all aliases are replaced with \lstinline{->}: other than having the fewest characters and better readability, the choice is entirely arbitrary. Prior to the replacements, a space is added after all substrings that resemble a \LaTeX{} command, i.e. any substring beginning with \lstinline{\} and a string of non-whitespace characters. This ensures we do not accidentally replace parts of a \LaTeX{} command and e.g. turn \lstinline{\toI} into \lstinline{->I}. The user may have intended the latter, but the former is a typo nonetheless.
 
 \paragraph{Generate parser}
 The parser outputs three types of tokens: \lstinline{Terminal}, \lstinline{NonTerminal}, and \lstinline{Multiset}. The final parser tries to match a non-terminal, then (if it fails) a multiset, then (if both fail) a terminal. Each of these sub-parsers is generated as follows:
@@ -82,7 +82,7 @@ The parser outputs three types of tokens: \lstinline{Terminal}, \lstinline{NonTe
     \begin{itemize}
         \item If an alternative begins with a \lstinline{Terminal}, the contribution of the \lstinline{Terminal} to the first set is itself.
         \item If an alternative begins with a \lstinline{NonTerminal}, the contribution of the \lstinline{NonTerminal} to the first set is the first set of the rule corresponding to the \lstinline{NonTerminal}.
-        \item If an alternative begins with a \lstinline{Multiset}, the contribution of the \lstinline{Multiset} to the first set is the union of the singleton \{ \textbackslash varnothing \} and the contribution of the first token of the element definition.
+        \item If an alternative begins with a \lstinline{Multiset}, the contribution of the \lstinline{Multiset} to the first set is the union of the singleton \{ \lstinline{\varnothing} \} and the contribution of the first token of the element definition.
     \end{itemize}
 \end{definition}
 
@@ -95,8 +95,8 @@ For example, consider the following syntax definition:
 The first set of each of the rules is computed as follows:
 \begin{itemize}
     \item The first set of the rule corresponding to $A$ is the set containing $x$, $y$, $z$, and the left parenthesis $($.
-    \item The first set of the rule corresponding to $\Gamma$ is the set containing \textbackslash varnothing and the contribution of $A$, i.e. the set containing $x$, $y$, $z$, and the left parenthesis $($.
-    \item The first set of the rule corresponding to a statement is the contribution of $\Gamma$, i.e. the set containing \textbackslash varnothing, $x$, $y$, $z$, and the left parenthesis $($.
+    \item The first set of the rule corresponding to $\Gamma$ is the set containing \lstinline{\varnothing} and the contribution of $A$, i.e. the set containing $x$, $y$, $z$, and the left parenthesis $($.
+    \item The first set of the rule corresponding to a statement is the contribution of $\Gamma$, i.e. the set containing \lstinline{\varnothing}, $x$, $y$, $z$, and the left parenthesis $($.
 \end{itemize}
 
 \subsubsection{\texorpdfstring{\lstinline{NonTerminal}}{NonTerminal}s sharing non-disjoint first sets with \texorpdfstring{\lstinline{NonTerminal}}{NonTerminal}s and \mbox{\texorpdfstring{\lstinline{Terminal}}{Terminal}s}}
@@ -119,11 +119,11 @@ After the substitution, the first set of the alternative $Czx$ is $\{ y, w \}$, 
 \]
 Since there are no more \lstinline{NonTerminal}s left, left-factoring is straightforward:
 \[
-    \text{Statement} \Coloneqq x(x|y) \alt y(zx|y) \alt wzx \alt zx
+    \text{Statement} \Coloneqq x(x|y) \alt y(zx|y) \alt w(zx|y) \alt zx
 \]
-The main disadvantage of this approach is that information about the \lstinline{NonTerminal}s is destroyed by the substitutions. The parser generated from the left-factored definition after substitutions only treats the input as a list of \lstinline{Terminal}s, instead of a \lstinline{NonTerminal} followed by a \lstinline{Terminal}. This complicates the process of matching abstract terms in inference rules.
+The main disadvantage of this approach is that information about the \lstinline{NonTerminal}s is destroyed by the substitutions. The parser generated from the left-factored definition after substitutions only treats a statement as a list of \lstinline{Terminal}s, instead of a \lstinline{NonTerminal} followed by a \lstinline{Terminal}. This complicates the process of matching abstract terms in inference rules.
 
-\subsubsection{\texorpdfstring{\lstinline{Multiset}}{Multiset}s sharing non-disjoint first sets with \texorpdfstring{\lstinline{NonTerminal}}{NonTerminal}s and \texorpdfstring{\lstinline{Terminal}}{Terminal}s}
+\subsubsection{\texorpdfstring{\lstinline{Multiset}}{Multiset}s sharing non-disjoint first sets with \texorpdfstring{\lstinline{NonTerminal}}{NonTerminal}s}
 Consider the following syntax definition:
 \begin{align*}
     \text{Statement} &\Coloneqq \Gamma \vdash x \alt A \vdash y \\
@@ -134,7 +134,7 @@ Humans reading the syntax definition can quickly differentiate the two alternati
 
 However, a parser does not know it should look for these defining characters in general. When the parser parses the term $x \vdash y$ from left to right, the prefix $x \vdash$ matches both alternatives: at this point, should the parser treat $x$ as a multiset with one element, a non-terminal, or an indeterminate form?
 
-One attempt to parse correctly without regards to the the original structure of the definitions is to first rewrite the definition of the offending \lstinline{Multiset}s, then substitute occurrences of the \lstinline{Multiset}s with their rewritten definitions. In this example, the rule corresponding to $\Gamma$ is rewritten as
+One attempt to parse correctly is to first rewrite the definition of the offending \lstinline{Multiset}s, then substitute occurrences of the \lstinline{Multiset}s with their rewritten definitions. In this example, the rule corresponding to $\Gamma$ is rewritten as
 \[
     \Gamma \Coloneqq \varnothing \alt A \ [\text{optionally followed by 0 or more repetitions of },A]
 \]
@@ -147,7 +147,7 @@ The offending occurrence of $\Gamma$ in the definition of a statement is substit
 The substituted definition of a statement can now be left-factored:
 \begin{align*}
     \text{Statement} \Coloneqq \ &\varnothing \vdash x \\
-    \alt &A \ [\text{optionally followed by 0 or more repetitions of },A] \vdash (x|y)
+    \alt &A \ (\vdash (x|y) \alt [\text{1 or more repetitions of },A] \vdash x)
 \end{align*}
 This solution has the same drawback as that in \Cref{syntax:factorisation:nonterm}: the structure of $\Gamma$ is destroyed by rewriting and substitution. It is not always possible to determine whether the current part of the input is a \lstinline{NonTerminal} or a \lstinline{Multiset} before parsing the next part of the input (e.g. $x \vdash y$), which complicates attempts to recover the destroyed structure after fully parsing the input.
 
@@ -184,7 +184,7 @@ The final syntax definition becomes
     \alt &yx \ [\text{optionally 0 or more },yx] \\
     \alt &zy \ [\text{optionally 0 or more },zy]
 \end{align*}
-which destroys the structure of $\Gamma$ and $\Delta$ in the original syntax definition.
+which destroys the structures of $\Gamma$ and $\Delta$ in the original syntax definition.
 
 \subsection{Limitation: metavariables cannot be used as terminals}
 Suppose a user tries to define the syntax of $\lambda$-terms:
@@ -201,4 +201,4 @@ The use of $var$ is unconventional and differs from most textbook formulations. 
 \[
   a, b \Coloneqq \varphi \alt (a \to b)
 \]
-Since the $a$ and $b$ in the second alternative are treated as strings instead of metavariables, this definition is actually not self-recursive.
+Since the $a$ and $b$ in the second alternative are treated as strings instead of metavariables, this definition is actually not recursive and does not accept e.g. the term $(\varphi \to \varphi)$.

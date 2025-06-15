@@ -4,11 +4,11 @@ Inference rules define the valid proof steps in a proof system. The application 
 \[
     \Inf[\text{Rule name}]{\text{Zero or more premises}}{\text{Conclusion}}
 \]
-which lets us derive the conclusion if all the premises hold. Inference rules can use metavariables to match any concrete term. Inference rules can also destructure concrete terms and reject concrete terms that cannot be destructured according to the inference rule. The premises and conclusion of an inference rule are specialised statements that carry structural information and should be parsed more like concrete terms than syntax rules. These specialised statements are called \textit{abstract statements}, consisting of \textit{abstract terms}, which are either metavariables or destructurings of concrete terms.
+which lets us derive the conclusion if all the premises hold. Inference rules can use metavariables to match any concrete term. Inference rules can also destructure concrete terms and reject concrete terms that cannot be destructured accordingly. The premises and conclusion of an inference rule are specialised statements that carry structural information and should be parsed more like concrete terms than syntax rules. These specialised statements are called \textit{abstract statements}, consisting of \textit{abstract terms}, which are either metavariables or destructurings of concrete terms.
 
 Like syntax rules, inference rules may be added, deleted, or replaced by the user. \projectname{} provides an interface for modifying inference rules, checks whether the inference rules are defined sensibly, and verifies whether the user has applied an inference rule correctly.
 
-\Cref{inference:syntax} defines the syntax in which a user expresses an inference rule in the application, describes the concept of \textit{abstract terms}, and contrasts it with \textit{concrete terms} introduced in the previous chapter. \Cref{inference:parsing} describes the procedure for transforming an arbitrary set of inference rules into intermediate internal representations, in preparation for verifying applications of the inference rules in the derivation tree.
+\Cref{inference:syntax} defines the syntax in which a user expresses an inference rule in the application, describes the concept of \textit{abstract terms}, and contrasts it with \textit{concrete terms} introduced in \Cref{section:term}. \Cref{inference:parsing} describes the procedure for transforming an arbitrary set of inference rules into intermediate internal representations, in preparation for verifying applications of the inference rules in the derivation tree.
 
 \subsection{Syntax of inference rules}
 \label{inference:syntax}
@@ -37,7 +37,7 @@ Recall from \Cref{syntax:syntax} that in syntax rule definitions, metavariables 
 \[
     A, B \Coloneqq \varphi \alt (A \to A)
 \]
-Even though $A$ appears twice in different positions of the same alternative, the two concrete terms that take their positions can be different. For example, $(\varphi \to (\varphi \to \varphi))$ is a valid instance of both versions of the syntax rule. However, the abstract term $(A \to A)$ is compatible with a concrete term if and only if the two user-inputted sub-terms that take the positions of the two occurrences of $A$ are identical. In this case, $(\varphi \to (\varphi \to \varphi))$ is incompatible with the abstract term $(A \to A)$ because the sub-terms $\varphi$ and $(\varphi \to \varphi)$ are different. The process of matching abstract terms with concrete terms is explained in detail in \Cref{chapter:checking}.
+Even though $A$ appears twice in different positions of the same alternative, the two concrete terms that take their positions can be different. For example, $(\varphi \to (\varphi \to \varphi))$ is a valid instance of both versions of the syntax rule. However, the abstract term $(A \to A)$ is compatible with a concrete term if and only if the two concrete terms that take the positions of the two occurrences of $A$ are identical. In this case, $(\varphi \to (\varphi \to \varphi))$ is incompatible with the abstract term $(A \to A)$ because the sub-terms $\varphi$ and $(\varphi \to \varphi)$ are different. The process of matching abstract terms with concrete terms is explained in detail in \Cref{chapter:checking}.
 
 \paragraph{Multisets in inference rules}
 \label{inference:multisets}
@@ -46,7 +46,7 @@ Consider the following syntax rules:
     \Gamma, \Delta &\Coloneqq \{ A \} \\
     A, B &\Coloneqq \varphi \alt (A \to B)
 \end{align*}
-On its own, $\Gamma$ represents a complete multiset. Now, consider the term $\Gamma, A$. In this term, $\Gamma$ represents a multiset with one element removed. The removed element is given the name $A$. Since an element can be removed, the user-inputted multiset must contain at least one element: trying to match the concrete term $\varnothing$ against the abstract term $\Gamma, A$ results in an error. Note that $\Gamma$ can be empty. Analogously, it is possible to:
+On its own, $\Gamma$ represents a complete multiset. Now, consider the term $\Gamma, A$. In this term, $\Gamma$ represents a multiset with one element removed. The removed element is given the name $A$. Since an element can be removed, the concrete multiset must contain at least one element: trying to match the concrete term $\varnothing$ against the abstract term $\Gamma, A$ results in an error. Note that $\Gamma$ can be empty. Analogously, it is possible to:
 \begin{itemize}
     \item Match multiple multiset elements, such as $\Gamma, A, B$ and $\Gamma, A, A, A$.
     \item Match multiple multisets, such as $\Gamma, \Delta$.
@@ -64,7 +64,7 @@ The order of the multiset metavariables and multiset element metavariables does 
     \Gamma, \Delta, A, B \qquad \Gamma, B, \Delta, A \qquad A, B, \Delta, \Gamma \qquad \Delta, B, A, \Gamma \qquad \ldots
 \]
 
-Note that a metavariables (in this case, $\Gamma$ or $\Delta$) can represent a multiset if and only if at least one of its alternatives only consists of a multiset and no other tokens. For example, if the first syntax rule in the example above is changed to
+Note that a metavariable (in this case, $\Gamma$ or $\Delta$) can represent a multiset if and only if at least one of its alternatives only consists of a multiset and no other tokens. For example, if the first syntax rule in the example above is changed to
 \[
     \Gamma, \Delta \Coloneqq \{ A \}: B
 \]
@@ -103,16 +103,16 @@ The aim of this step is to generate parsers for parsing an abstract statement in
             ) {}
         }
     \end{lstlisting}
-    Match a multiset of elements given by the \lstinline{elements} field. A member of \lstinline{elements} can either be a \lstinline{Name} or a \lstinline{MultisetElement}. A \lstinline{Name} refers to a multiset (e.g. $\Gamma$ and $\Delta$ in the example in the previous section) while a \lstinline{MultisetElement} refers to a multiset element that must be matched from the user-inputted multiset term (e.g. $A$ and $(A \to B)$ in the previous section). The \lstinline{elements} field is represented as an (ordered) array instead of an unordered set purely for simpler bookkeeping in the matching algorithm.
+    Match a multiset of elements given by the \lstinline{elements} field. A member of \lstinline{elements} can either be a \lstinline{Name} or a \lstinline{MultisetElement}. A \lstinline{Name} refers to a multiset (e.g. $\Gamma$ and $\Delta$ in the example in \Cref{inference:multisets}) while a \lstinline{MultisetElement} refers to a multiset element that must be matched from the concrete multiset term (e.g. $A$ and $(A \to B)$ in \Cref{inference:multisets}). The \lstinline{elements} field is represented as an (ordered) list instead of an unordered set purely for simpler bookkeeping in the matching algorithm.
 \end{itemize}
 Finally, the \lstinline{Matchable} type is defined as
 \begin{center}
     \lstinline{type Matchable = MatchableTerminal | Name | MatchableNonTerminal | MatchableMultiset;}
 \end{center}
 \subsubsection{Procedure}
-Parsing abstract statements is similar to parsing terms, as an abstract statement can be thought of as an instance of a statement in a different context. As with generating term parsers, a delayed parser is created  for every syntax rule using the \lstinline{later} combinator. Each of these delayed parsers is instantiated by iterating over the tokens in every alternative of the syntax rule and examining the type of the token:
+Parsing abstract statements is similar to parsing concrete statements. As with generating term parsers, a delayed parser is created  for every syntax rule using the \lstinline{later} combinator. Each of these delayed parsers is instantiated by iterating over the tokens in every alternative of the syntax rule and examining the type of the token:
 \begin{itemize}
     \item \lstinline{Terminal}: parse the string verbatim and wrap the result in a \lstinline{MatchableTerminal} token.
     \item \lstinline{NonTerminal}: either parse a metavariable of the rule corresponding to the rule number (i.e. the \lstinline{index} field of the \lstinline{NonTerminal}), or an expanded version of the definition of the syntax rule using the (delayed) parser corresponding to the rule. The former produces a \lstinline{Name} token while the latter produces a \lstinline{MatchableNonTerminal} token.
-    \item \lstinline{Multiset}: either parse \lstinline{\varnothing} (corresponding to the empty set) or a comma-separated list of multiset elements, as described in \Cref{inference:multisets}. If metavariables for multisets are applicable here (i.e. the \lstinline{Multiset} token is the only token of an alternative of the syntax rule definition, and the syntax rule does not define a statement), the comma-separated list can contain both individual multiset elements and metavariables for multisets. Since the \lstinline{Multiset} token does not store the rule number of the rule it is part of, the rule number is passed as an argument to the function which generates inference rule parsers.
+    \item \lstinline{Multiset}: either parse \lstinline{\varnothing} (corresponding to the empty set) or a comma-separated list of multiset elements, as described in \Cref{inference:multisets}. If metavariables for multisets are applicable here (i.e. the \lstinline{Multiset} token is the only token of an alternative of the syntax rule definition, and the syntax rule does not define a statement), the comma-separated list can contain both individual multiset elements and metavariables for multisets.
 \end{itemize}

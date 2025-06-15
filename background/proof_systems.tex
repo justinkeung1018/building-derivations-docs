@@ -1,11 +1,11 @@
 \section{Proof systems}
 \label{background:proof-systems}
-This section presents an overview of Natural Deduction \ndt{}, the simply typed $\lambda$-calculus, and the Sequent Calculus \textsc{lk}. that are pre-defined in the web application, and on which most of the algorithm development is based.
+This section presents an overview of Natural Deduction \ndt{}, the simply typed $\lambda$-calculus, and the Sequent Calculus \textsc{lk}. They are pre-defined in the web application, and on which most of the algorithm development is based.
 
 \subsection{Natural Deduction \texorpdfstring{\ndt{}}{with implication}}
 In 1934, Gerhard Gentzen introduced the Natural Deduction systems \textsc{nj} and \textsc{nk} \cite{gentzen:1969}. This section gives the definition of \ndt{}, a subsystem of Natural Deduction which has implication ($\to$) as the only logical connective.
 \begin{definition}[Formulae in \ndt{}]
-    The formulae for $\textsc{nd}_\to$ are:
+    The formulae in $\textsc{nd}_\to$ are:
     \[
         A, B \Coloneqq x \alt (A \to B)
     \]
@@ -37,7 +37,7 @@ For example, the system \ndt{} above can easily be extended with the conjunction
 }%
 
 \subsubsection{Choice of notation}
-In Gentzen's original formulation \cite{gentzen:1969}, there are neither contexts nor turnstiles. Each statement only consists of a term. The $(\arr I)$ rule in the original formulation can refer to any term arbitrarily higher up. It is not \textit{localised}, since it does not always only depend on the premises and conclusion immediately above and below the dividing line. On the contrary, the formulation presented above is \textit{localised}, since all rules only depend on the premises and conclusion immediately above and below the dividing line. The differences between Gentzen's original formulation and the formulation above are highlighted in \Cref{fig:background:natural-deduction}.
+In Gentzen's original formulation \cite{gentzen:1969}, there are neither contexts nor turnstiles. Each statement only consists of a formula. The $(\arr I)$ rule in the original formulation can refer to any term arbitrarily higher up in the derivation. It is not \textit{localised}, since it does not always only depend on the premises and conclusion immediately above and below the dividing line. On the contrary, the formulation presented above is \textit{localised}, since all rules only depend on the premises and conclusion immediately above and below the dividing line. The differences between Gentzen's original formulation and the formulation above are highlighted in \Cref{fig:background:natural-deduction}.
 
 \begin{figure}[!htbp]
     \centering
@@ -69,7 +69,7 @@ In Gentzen's original formulation \cite{gentzen:1969}, there are neither context
         \]
         \caption{Localised formulation}
     \end{subfigure}
-    \caption{An example derivation highlighting the differences between Gentzen's original formulation of natural deduction and a localised formulation}
+    \caption{An example derivation highlighting the differences between Gentzen's original formulation of Natural Deduction and a localised formulation}
     \label{fig:background:natural-deduction}
 \end{figure}
 
@@ -100,7 +100,7 @@ Types can enable certain compiler optimisations, such as using specialised machi
     \[
         A, B \Coloneqq \varphi \alt (A \rightarrow B)
     \]
-    where $\varphi$ can be any symbol from an infinite list $\varphi_1, \varphi_2, \ldots$ of type variables. When writing type variables by hand, it is often more convenient to use the subscript alone to represent a type variable, e.g. the type $((1 \rightarrow 2) \rightarrow 1)$ represents the type $((\varphi_1 \rightarrow \varphi_2) \rightarrow \varphi_1)$.
+    where $\varphi$ can be any symbol from an infinite list $\varphi_1, \varphi_2, \ldots$ of type variables. When writing type variables by hand, it is often more convenient to use the subscript alone to represent a type variable, e.g. the type $((1 \rightarrow 2) \rightarrow 1)$ represents the type $((\varphi_1 \rightarrow \varphi_2) \rightarrow \varphi_1)$. We will only use numbers from this point onwards.
 \end{definition}
 \begin{definition}[Contexts in Curry type assignment]
     A \textit{context} $\Gamma$ is a set containing elements in the form $x:A$, where $x$ is a variable and $A$ is a Curry type. All variables are assigned at most one type in any context. For example, $x:1, x:2$ is not a well-formed context since $x$ appears twice.
@@ -114,7 +114,7 @@ Types can enable certain compiler optimisations, such as using specialised machi
     {
         \derivationfont
         \[
-            (Ax): \frac{}{\Gamma, x:A \vdash x:A} \quad (\arr I): \frac{\Gamma, x:A \vdash M:B}{\Gamma \vdash \lambda x. M: (A \to B)} \quad (\arr E): \frac{\Gamma \vdash M: (A \to B) \quad \Gamma \vdash N: A}{\Gamma \vdash MN: (A \to B)}
+            (Ax): \frac{}{\Gamma, x:A \vdash x:A} \quad (\arr I): \frac{\Gamma, x:A \vdash M:B}{\Gamma \vdash (\lambda x. M): (A \to B)} \quad (\arr E): \frac{\Gamma \vdash M: (A \to B) \quad \Gamma \vdash N: A}{\Gamma \vdash (MN): (A \to B)}
         \]
     }%
 \end{definition}
@@ -134,7 +134,7 @@ Each \textit{judgement} (or \textit{statement}, \textit{sequent}) takes the form
 \[
     \Gamma \vdash \Delta
 \]
-where $\Gamma$ and $\Delta$ represent possibly empty, unordered \textit{multiset}s of propositional formulae. Note that $\Gamma$ in the simply typed $\lambda$-calculus is a \textit{set} (i.e. it cannot contain duplicates), while the $\Gamma$ and $\Delta$ here in the system \textsc{lk} is a \textit{multiset} (i.e. it can contain duplicates). When expanded, a statement in the system \textsc{lk} looks like this:
+where $\Gamma$ and $\Delta$ represent possibly empty, unordered \textit{multiset}s of propositional formulae. Note that $\Gamma$ in the simply typed $\lambda$-calculus is a \textit{set} (i.e. it cannot contain duplicates), while the $\Gamma$ and $\Delta$ here in the system \textsc{lk} are a \textit{multisets} (i.e. they can contain duplicates). When expanded, a statement in the system \textsc{lk} looks like this:
 \begin{equation}
     \label{eqn:background:sequent}
     A_1, \ldots, A_n \vdash B_1, \ldots B_m

@@ -5,7 +5,7 @@
 
 \section{Correctness of algorithms}
 \label{evaluation:correctness}
-The correctness of the parsing, matching, and verification algorithms are verified using unit tests. Some test cases are based on the three pre-defined proof systems---Natural Deduction \ndt{}, Curry type assignment for the $\lambda$-calculus, and the system \textsc{lk}---while other test cases are based on variously modified rules from these systems and designed to catch edge cases. Some test cases based on the $\lambda$-calculus are taken from the course notes for the Type Systems module at Imperial \cite{van-bakel:2022}. Some test cases based on the system \textsc{lk} are taken from a set of online logic notes \cite{sequent}.
+The correctness of the parsing, matching, and verification algorithms are verified using unit tests. Some test cases are based on the three pre-defined proof systems---Natural Deduction \ndt{}, Curry type assignment for the $\lambda$-calculus, and the system \textsc{lk}---while other test cases are based on variously modified rules from these systems and designed to catch edge cases. Some test cases based on the $\lambda$-calculus are taken from the course notes for the Type Systems for Programming Languages module at Imperial \cite{van-bakel:2022}. Some test cases based on the system \textsc{lk} are taken from a set of online logic notes \cite{sequent}.
 
 There is a high degree of confidence in the matching and verification algorithms, since they are based on custom data structures independent of the user input. To identify further edge cases in the parsing algorithm and determine how well the parsing algorithm adapts to a wide range of user inputs, the parsing algorithm is tested against extensions of the pre-defined systems and brand new proof systems.
 
@@ -137,7 +137,7 @@ The users were asked to complete three tasks: the first task involves deriving a
 \subsubsection{Curry type assignment system for the \lc{}}
 In this task, the user is asked to derive the conclusion
 \[
-    \varnothing \vdash ((\lambda x. x)(\lambda y. y))
+    \varnothing \vdash ((\lambda x. x)(\lambda y. y)): (1 \to 1)
 \]
 in the Curry type assignment system using the web application. This particular conclusion is chosen because it is fairly simple and its derivation requires all three type assignment rules $(Ax)$, $(\arr I)$, and $(\arr E)$.
 
@@ -243,7 +243,7 @@ Two users mistakenly typed the conclusion of the second premise of a rule into t
 At the time of testing, there were only placeholders for the conclusion and rule name inputs at the root of the tree: the expectation was that once users input the first conclusion and rule name, they should be able to navigate the rest of the derivation tree without additional guidance. However, user testing showed otherwise. The solution was to add placeholders for all inputs in the derivation tree to indicate whether it should be a conclusion or a rule name.
 
 \subsubsection{Displaying parsing errors before rules are specified}
-When completing the first user testing task, one user inputted all conclusions of the tree before inputting the rule names. Since the web application only displayed errors when the user has specified the rule at the time of testing, the user received no feedback on syntactically incorrect inputs when inputting the conclusions and only received multiple error messages once he started typing the rule names.
+When completing the first user testing task, one user input all conclusions of the tree before inputting the rule names. Since the web application only displayed errors when the user has specified the rule at the time of testing, the user received no feedback on syntactically incorrect inputs when inputting the conclusions and only received multiple error messages once he started typing the rule names.
 
 The solution is to display two types of errors: general errors regardless of whether the user has specified a rule, and additional specific errors when the user has specified a rule. General errors are displayed when the user inputs a syntactically incorrect statement. Specific errors are displayed when the user inputs a syntactically correct statement which is not compatible with the structure of the corresponding abstract statement, such as when a multiset element with a certain structure cannot be found in the user input, or if some names are incompatible.
 
